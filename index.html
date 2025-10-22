@@ -3,265 +3,138 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mini Dashboard — Supabase</title>
+  <title>כניסה — ניהול תקציב משפחתי</title>
   <style>
-    :root { --border:#e5e7eb; --muted:#6b7280; --bg:#fafafa; --accent:#0ea5e9; }
+    :root { --bg:#0b1220; --card:#111827; --muted:#9ca3af; --text:#f3f4f6; --accent:#10b981; --danger:#ef4444; --border:#1f2937; }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; margin: 0; background: var(--bg); color:#111; }
-    header { padding: 24px; display:flex; gap:16px; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; }
-    h1 { margin:0; font-size: 20px; }
-    main { padding: 24px; max-width: 920px; margin: 0 auto; display:grid; gap:24px; }
-    .card { background:#fff; border:1px solid var(--border); border-radius: 14px; padding: 16px; }
-    label { display:block; font-size:14px; color:var(--muted); margin-bottom:6px; }
-    input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
-    button { padding:10px 14px; border:1px solid var(--border); border-radius:10px; cursor:pointer; background:#fff; }
-    button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    html, body { height:100%; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .wrap { min-height:100%; display:grid; place-items:center; padding: 24px; }
+    .card { width:100%; max-width: 420px; background: var(--card); border:1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    h1 { margin: 0 0 8px 0; font-size: 20px; letter-spacing:.3px; }
+    p.muted { margin: 0 0 16px 0; color: var(--muted); font-size: 14px; }
+    label { display:block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+    input { width:100%; padding: 12px 14px; border-radius: 12px; background:#0d1526; border:1px solid var(--border); color: var(--text); }
+    input::placeholder { color:#6b7280; }
+    button { width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--border); background: var(--accent); color:#062c22; font-weight:700; cursor:pointer; }
     button:disabled { opacity:.6; cursor:not-allowed; }
-    .row { display:flex; gap:12px; align-items:end; flex-wrap:wrap; }
-    .muted { color:var(--muted); font-size: 14px; }
-    ul.list { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
-    .item { border:1px solid var(--border); border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
-    .hide { display:none; }
-    .ok { color:#10b981; font-weight:600; }
-    .err { color:#ef4444; }
-    footer { text-align:center; padding: 24px; color: var(--muted); }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .err { color: var(--danger); font-size: 14px; min-height: 18px; margin-top: 8px; }
+    .success { color: var(--accent); font-size: 14px; }
+    .footer { margin-top: 16px; text-align:center; color: var(--muted); font-size: 12px; }
+    .hidden { display:none; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>דשבורד קטן — Supabase</h1>
-    <div id="authBox" class="row">
-      <div id="signedOut" class="row">
-        <input id="email" type="email" placeholder="אימייל להתחברות" style="min-width:260px"/>
-        <button id="loginBtn" class="primary">שלח קישור כניסה</button>
+  <div class="wrap">
+    <div class="card" id="loginCard">
+      <h1>ניהול תקציב משפחתי</h1>
+      <p class="muted">מסך כניסה</p>
+
+      <form id="loginForm" novalidate>
+        <label for="email">אימייל</label>
+        <input id="email" type="email" placeholder="name@example.com" autocomplete="username" required />
+
+        <label for="password">סיסמה</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+
+        <div class="row" style="margin-top:16px">
+          <span id="status" class="success hidden">מחובר ✔︎</span>
+          <button id="loginBtn" type="submit">התחבר</button>
+        </div>
+        <div id="error" class="err"></div>
+      </form>
+
+      <div id="signedInBox" class="hidden" style="margin-top:10px">
+        <div class="row">
+          <span class="success">מחובר כ־<b id="userEmail"></b></span>
+          <button id="logoutBtn" type="button" style="width:auto;background:#0d1526;color:#e5e7eb">התנתק</button>
+        </div>
       </div>
-      <div id="signedIn" class="row hide">
-        <span class="muted">מחובר כ־<b id="userEmail"></b></span>
-        <button id="logoutBtn">התנתק</button>
-      </div>
+
+      <div class="footer">מותאם לנייד • זוכר התחברות במכשיר</div>
     </div>
-  </header>
+  </div>
 
-  <main>
-    <section class="card">
-      <h2 style="margin-top:0">לקוחות</h2>
-      <p class="muted" id="status">התחבר כדי לראות את הלקוחות שלך.</p>
-
-      <div id="addForm" class="row hide">
-        <div style="flex:1; min-width:220px">
-          <label>שם לקוח</label>
-          <input id="name" placeholder="לדוגמה: יעל לוי" />
-        </div>
-        <div style="flex:1; min-width:220px">
-          <label>טלפון</label>
-          <input id="phone" placeholder="050-1234567" />
-        </div>
-        <button id="addBtn" class="primary">הוסף</button>
-      </div>
-
-      <ul id="list" class="list" style="margin-top:12px"></ul>
-      <p id="error" class="err"></p>
-    </section>
-
-    <section class="card">
-      <h3 style="margin-top:0">בדיקות</h3>
-      <div class="row">
-        <button id="pingBtn">בדיקת חיבור ל-Supabase</button>
-        <span id="pingOut" class="muted"></span>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    בנוי כדף סטטי. אפשר להעלות ל-GitHub Pages / Netlify / Vercel.
-  </footer>
-
-  <!-- Supabase JS v2 from CDN -->
+  <!-- Supabase JS v2 -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    // TODO: עדכן לפרטי הפרויקט שלך
-    const SUPABASE_URL = "https://avhosytqnsqkrapnwhfq.supabase.co"; // לדוגמה: https://abc123.supabase.co
+    // 1) עדכן לפרויקט שלך
+    const SUPABASE_URL = "https://avhosytqnsqkrapnwhfq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2aG9zeXRxbnNxa3JhcG53aGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjMzMjMsImV4cCI6MjA3NjM5OTMyM30.j0fSPfrpOIlByTChwt1lrVx7bK6BVrl9c1Jt0_AEkPk";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // 2) יצירת לקוח עם שמירת סשן אוטומטית וריענון טוקנים
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
 
+    // 3) DOM
     const els = {
-      signedOut: document.getElementById('signedOut'),
-      signedIn: document.getElementById('signedIn'),
-      userEmail: document.getElementById('userEmail'),
+      loginForm: document.getElementById('loginForm'),
       email: document.getElementById('email'),
+      password: document.getElementById('password'),
       loginBtn: document.getElementById('loginBtn'),
-      logoutBtn: document.getElementById('logoutBtn'),
-      addForm: document.getElementById('addForm'),
-      addBtn: document.getElementById('addBtn'),
-      name: document.getElementById('name'),
-      phone: document.getElementById('phone'),
-      list: document.getElementById('list'),
       status: document.getElementById('status'),
       error: document.getElementById('error'),
-      pingBtn: document.getElementById('pingBtn'),
-      pingOut: document.getElementById('pingOut')
+      signedInBox: document.getElementById('signedInBox'),
+      userEmail: document.getElementById('userEmail'),
+      logoutBtn: document.getElementById('logoutBtn')
     };
 
+    function showError(msg) { els.error.textContent = msg || ''; }
+    function setLoading(is) { els.loginBtn.disabled = !!is; }
+
     function showSignedIn(email) {
-      els.signedOut.classList.add('hide');
-      els.signedIn.classList.remove('hide');
-      els.addForm.classList.remove('hide');
+      els.signedInBox.classList.remove('hidden');
       els.userEmail.textContent = email || '';
-      els.status.textContent = 'טען/י או הוסף לקוחות — הנתונים מבודדים לפי המשתמש שלך (RLS).';
+      els.status.classList.remove('hidden');
+      showError('');
     }
-
     function showSignedOut() {
-      els.signedOut.classList.remove('hide');
-      els.signedIn.classList.add('hide');
-      els.addForm.classList.add('hide');
+      els.signedInBox.classList.add('hidden');
       els.userEmail.textContent = '';
-      els.list.innerHTML = '';
-      els.status.textContent = 'התחבר כדי לראות את הלקוחות שלך.';
+      els.status.classList.add('hidden');
     }
 
-    async function refreshSessionUI() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    showSignedIn(session.user.email); // אל תקרא כאן ל-loadCustomers
-  } else {
-    showSignedOut();
-  }
-}
-
-
-    // Auth: magic link
-    els.loginBtn.addEventListener('click', async () => {
-      els.loginBtn.disabled = true;
+    // 4) טופס כניסה (Email + Password)
+    els.loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setLoading(true);
       try {
         const email = els.email.value.trim();
-        if (!email) throw new Error('נא להזין אימייל');
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: window.location.origin }
-        });
+        const password = els.password.value;
+        if (!email || !password) throw new Error('נא להזין אימייל וסיסמה');
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        alert('נשלח קישור כניסה לאימייל. פתח/י את הקישור כדי להתחבר.');
-      } catch (e) {
-        alert('שגיאה: ' + e.message);
+        // onAuthStateChange יעדכן UI
+      } catch (err) {
+        showError('שגיאה: ' + (err?.message || err));
       } finally {
-        els.loginBtn.disabled = false;
+        setLoading(false);
       }
     });
 
+    // 5) Logout
     els.logoutBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
       showSignedOut();
     });
 
-    // CRUD — Customers
-    async function loadCustomers() {
-      els.error.textContent = '';
-      els.list.innerHTML = '';
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) {
-        els.error.textContent = 'שגיאת טעינה: ' + error.message;
-        return;
+    // 6) האזנה לסשן — זוכר התחברות אוטומטית
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        showSignedIn(session.user.email);
+        // TODO: בעתיד: window.location.href = '/app.html';
+      } else {
+        showSignedOut();
       }
-      if (!data || data.length === 0) {
-        els.list.innerHTML = '<li class="muted">אין עדיין לקוחות.</li>';
-        return;
-      }
-      data.forEach(c => {
-        const li = document.createElement('li');
-        li.className = 'item';
-        li.innerHTML = `<span><b>${escapeHtml(c.name)}</b> — ${escapeHtml(c.phone || '')}</span>` +
-                       `<button data-id="${c.id}">מחק</button>`;
-        li.querySelector('button').addEventListener('click', () => deleteCustomer(c.id));
-        els.list.appendChild(li);
-      });
-    }
-
-    async function addCustomer() {
-      els.addBtn.disabled = true;
-      try {
-        const name = els.name.value.trim();
-        const phone = els.phone.value.trim();
-        if (!name) throw new Error('שם הוא שדה חובה');
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) throw new Error('לא מחובר');
-        const { error } = await supabase
-          .from('customers')
-          .insert({ name, phone, user_id: session.user.id });
-        if (error) throw error;
-        els.name.value = '';
-        els.phone.value = '';
-        await loadCustomers();
-      } catch (e) {
-        alert('שגיאה: ' + e.message);
-      } finally {
-        els.addBtn.disabled = false;
-      }
-    }
-
-    async function deleteCustomer(id) {
-      try {
-        const { error } = await supabase
-          .from('customers')
-          .delete()
-          .eq('id', id);
-        if (error) throw error;
-        await loadCustomers();
-      } catch (e) {
-        alert('שגיאה: ' + e.message);
-      }
-    }
-
-    els.addBtn.addEventListener('click', addCustomer);
-
-    // Simple HTML escaper
-    function escapeHtml(str) {
-      return String(str || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    // Ping (simple read of current user)
-    els.pingBtn.addEventListener('click', async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      els.pingOut.textContent = user ? 'מחובר ✔︎' : 'לא מחובר';
     });
 
-    // Keep UI in sync with auth state
-    // נטרל רינדורים כפולים: לעיתים Supabase יורה כמה אירועים בעלייה (INITIAL_SESSION / TOKEN_REFRESHED / SIGNED_IN)
-  // נטרול כפילויות טעינה
-let bootstrapped = false;
-let loadingCustomers = false;
-
-async function safeLoadCustomers() {
-  if (loadingCustomers) return;
-  loadingCustomers = true;
-  try { await loadCustomers(); } finally { loadingCustomers = false; }
-}
-
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    showSignedIn(session.user.email);
-    // נטען פעם אחת בלבד בעלייה הראשונית או לאחר התחברות ידנית
-    if (!bootstrapped && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
-      bootstrapped = true;
-      safeLoadCustomers();
-    }
-  } else {
-    showSignedOut();
-    bootstrapped = false; // יציאה → נאפשר טעינה מחדש לאחר כניסה
-  }
-});
-
-// Init
-refreshSessionUI();
-
+    // 7) אתחול — במידה וקיים סשן שמור, זה יספיק כדי לזהות
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) showSignedIn(session.user.email); else showSignedOut();
+    })();
   </script>
 </body>
 </html>
