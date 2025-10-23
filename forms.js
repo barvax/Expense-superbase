@@ -223,3 +223,7 @@ els.txForm?.addEventListener('submit', async (e)=>{
     els.txErr.textContent = err?.message || String(err);
   }
 });
+function showModal(show){
+  els.addDialog.classList.toggle("hidden", !show);
+  document.body.classList.toggle("no-scroll", show); // חסימת גלילה לרקע
+}
