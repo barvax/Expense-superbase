@@ -147,3 +147,36 @@ html { -webkit-text-size-adjust: 100%; }
   -webkit-overflow-scrolling: touch;
 }
 .no-scroll { overflow:hidden; }
+/* כפתור מחיקה בשורה */
+.tx-right { display:flex; align-items:center; gap:10px; }
+.tx-del {
+  border:1px solid var(--border);
+  background:#0d1526;
+  color:#e5e7eb;
+  border-radius:10px;
+  padding:6px 8px;
+  cursor:pointer;
+}
+.tx-del:hover { outline:2px solid var(--danger); }
+
+/* מודאל אישור קטן */
+.confirm__card {
+  position: fixed;
+  left: 24px; right: 24px;
+  top: calc(env(safe-area-inset-top, 0px) + 24px);
+  bottom: auto;
+  max-width: 420px;
+  margin: 0 auto;
+  z-index: 51;
+}
+.badge {
+  display:inline-block;
+  padding:2px 8px;
+  margin-inline-start:6px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;
+  color:#e5e7eb;
+  background:#0d1526;
+  vertical-align:middle;
+}

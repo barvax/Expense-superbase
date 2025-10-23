@@ -1,4 +1,4 @@
-// details.js — פירוט חודשי לפי החודש שנבחר במסך הראשי
+// details.js — פירוט חודשי + מחיקה עם אישור
 
 function waitForSb() {
   return new Promise((resolve) => {
@@ -26,14 +26,26 @@ const els = {
   fltExpense: document.getElementById('fltExpense'),
   fltIncome:  document.getElementById('fltIncome'),
 
-  // בוררי חודש קיימים ב-app: input#month או selects (נתמוך בשני המודלים)
+  // חודש מהמסך הראשי
   monthInput:  document.getElementById('month'),
   monthSelect: document.getElementById('monthSelect'),
   yearSelect:  document.getElementById('yearSelect'),
+
+  // מודאל אישור מחיקה
+  confirmDlg:  document.getElementById('confirmDialog'),
+  confirmText: document.getElementById('confirmText'),
+  confirmYes:  document.getElementById('confirmYes'),
+  confirmNo:   document.getElementById('confirmNo'),
 };
+
+let pendingDeleteId = null;
 
 function showModal(show){
   els.dlg.classList.toggle('hidden', !show);
+  document.body.classList.toggle('no-scroll', show);
+}
+function showConfirm(show){
+  els.confirmDlg.classList.toggle('hidden', !show);
   document.body.classList.toggle('no-scroll', show);
 }
 
@@ -50,17 +62,16 @@ function ymFromUI(){
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
 }
-function monthRange(ym){ // -> { from:'YYYY-MM-01', to:'YYYY-MM-01 (next)' }
+// טווח חודש: [from, to)
+function monthRange(ym){
   const [y,m] = ym.split('-').map(s=>parseInt(s,10));
   const from = `${y}-${String(m).padStart(2,'0')}-01`;
-  const d = new Date(y, m, 1); // m is 1-based? fix: native month is 0-based, so:
-  // Correct Calc: next month:
-  const next = new Date(y, m, 1); // since Date uses 0-based month, pass m (current+1) gives first of next month
+  const next = new Date(y, m, 1); // Date: month 0-based; m = current month (1-12) → next month
   const to = `${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-01`;
   return { from, to };
 }
 
-// נטען קטגוריות למיפוי id-> {name, icon}
+// מפה id-> {name, icon}
 async function loadCategoryMap(sb){
   const { data, error } = await sb.from('categories').select('id,name,icon');
   if (error) throw error;
@@ -77,17 +88,28 @@ function rowHTML(t, cat){
   const dateStr = `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`;
   const amtCls = isInc ? 'ok' : 'bad';
   const note = t.note || '';
+
+  // חיווי תשלומים
+  const instBadge = (!isInc && t.expense_mode === 'installments')
+    ? `<span class="badge">תשלומים ${t.installment_index || '?'} / ${t.installments_total || '?'}</span>`
+    : '';
+
   return `
-  <div class="tx-row">
+  <div class="tx-row" data-id="${t.id}">
     <div class="tx-main">
       <div class="tx-emoji">${emoji}</div>
       <div class="tx-text">
-        <div class="tx-title">${catName}</div>
-        <div class="tx-note">${note || ''}</div>
+        <div class="tx-title">
+          ${catName} ${instBadge}
+        </div>
+        <div class="tx-note">${note}</div>
         <div class="tx-meta">${dateStr}</div>
       </div>
     </div>
-    <div class="tx-amt ${amtCls}">${fmtILS(t.amount_cents)}</div>
+    <div class="tx-right">
+      <div class="tx-amt ${amtCls}">${fmtILS(t.amount_cents)}</div>
+      <button class="tx-del" data-id="${t.id}" title="מחק">🗑️</button>
+    </div>
   </div>`;
 }
 
@@ -102,15 +124,13 @@ async function loadDetails(sb, filterKind /* 'all'|'expense'|'income' */){
   els.sumExpense.textContent = '₪0';
   els.sumDelta.textContent = '₪0';
 
-  // נטען קטגוריות למפה
   const catMap = await loadCategoryMap(sb);
 
-  // נטען תנועות לחודש
   let q = sb.from('transactions')
-            .select('id,kind,category_id,amount_cents,occurred_at,note')
-            .gte('occurred_at', from)
-            .lt('occurred_at', to)
-            .order('occurred_at', { ascending: false });
+  .select('id,kind,category_id,amount_cents,occurred_at,note,expense_mode,installments_total,installment_index,installment_group_id')
+  .gte('occurred_at', from)
+  .lt('occurred_at', to)
+  .order('occurred_at', { ascending: false });
 
   if (filterKind === 'expense') q = q.eq('kind','expense');
   if (filterKind === 'income')  q = q.eq('kind','income');
@@ -123,7 +143,6 @@ async function loadDetails(sb, filterKind /* 'all'|'expense'|'income' */){
     return;
   }
 
-  // סכומים
   let sumIncome = 0, sumExpense = 0;
   const html = data.map(t => {
     if (t.kind === 'income') sumIncome += t.amount_cents;
@@ -145,7 +164,7 @@ function activateTab(btn){
   btn.classList.add('active');
 }
 
-// פתיחה/סגירה
+// פתיחה/סגירה + חיווט
 (async () => {
   const sb = await waitForSb();
 
@@ -171,7 +190,77 @@ function activateTab(btn){
     activateTab(els.fltIncome); await loadDetails(sb, 'income');
   });
 
-  // כשיש תנועה חדשה → לרענן גם את הפירוט אם פתוח
+els.list?.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('.tx-del');
+  if (!btn) return;
+  pendingDeleteId = btn.dataset.id;
+
+  try {
+    const { data: txRows, error: txErr } = await sb
+      .from('transactions')
+      .select('kind, expense_mode, installment_group_id, occurred_at')
+      .eq('id', pendingDeleteId)
+      .limit(1);
+    if (txErr) throw txErr;
+    const tx = txRows?.[0];
+
+    if (tx?.kind === 'expense' && tx?.expense_mode === 'installments' && tx?.installment_group_id) {
+      els.confirmText.textContent = "למחוק את כל התשלומים העתידיים בסדרה זו (מהחודש הזה והלאה)? פעולה זו לא ניתנת לשחזור.";
+    } else {
+      els.confirmText.textContent = "למחוק את התנועה הזו? פעולה זו לא ניתנת לשחזור.";
+    }
+  } catch {
+    els.confirmText.textContent = "למחוק את התנועה הזו? פעולה זו לא ניתנת לשחזור.";
+  }
+
+  showConfirm(true);
+});
+
+  // אישור/ביטול מחיקה
+  els.confirmNo?.addEventListener('click', ()=>{ pendingDeleteId=null; showConfirm(false); });
+  els.confirmDlg?.addEventListener('click', (e)=>{ 
+    if (e.target.classList.contains('modal__backdrop')) { pendingDeleteId=null; showConfirm(false); }
+  });
+ els.confirmYes?.addEventListener('click', async ()=>{
+  if (!pendingDeleteId) return;
+  try {
+    // 1) שלוף את התנועה כדי לדעת אם זו סדרת תשלומים ומה התאריך
+    const { data: txRows, error: txErr } = await sb
+      .from('transactions')
+      .select('id, kind, expense_mode, installment_group_id, occurred_at')
+      .eq('id', pendingDeleteId)
+      .limit(1);
+    if (txErr) throw txErr;
+    const tx = txRows?.[0];
+    if (!tx) throw new Error('התנועה לא נמצאה');
+
+    // 2) אם זו הוצאה בתשלומים ויש group id → מחיקה קדימה לכל הסדרה
+    if (tx.kind === 'expense' && tx.expense_mode === 'installments' && tx.installment_group_id) {
+      const { error: delErr } = await sb
+        .from('transactions')
+        .delete()
+        .eq('installment_group_id', tx.installment_group_id)
+        .gte('occurred_at', tx.occurred_at); // מחיקה רק "קדימה"
+      if (delErr) throw delErr;
+    } else {
+      // 3) אחרת מחיקה בודדת
+      const { error } = await sb.from('transactions').delete().eq('id', pendingDeleteId);
+      if (error) throw error;
+    }
+
+    pendingDeleteId = null;
+    showConfirm(false);
+    // רענון פירוט ו-KPI
+    const activeKind = document.querySelector('.tabs .tab.active')?.dataset?.kind || 'all';
+    await loadDetails(sb, activeKind);
+    window.dispatchEvent(new Event('tx-changed'));
+  } catch (err) {
+    console.error(err);
+    alert('שגיאה במחיקה: ' + (err?.message || err));
+  }
+});
+
+  // כשתנועה חדשה מתווספת → רענן אם פתוח
   window.addEventListener('tx-changed', async ()=>{
     if (!els.dlg.classList.contains('hidden')) {
       const active = document.querySelector('.tabs .tab.active')?.dataset?.kind || 'all';

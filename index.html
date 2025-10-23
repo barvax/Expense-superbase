@@ -166,7 +166,21 @@
     <div class="muted small" id="detailsHint" style="margin-top:8px"></div>
   </div>
 </div>
-
+<!-- Modal: אישור מחיקה -->
+<div id="confirmDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="confirm__card card">
+    <h3 class="title" style="margin-top:0">למחוק את התנועה?</h3>
+    <p id="confirmText" class="muted small" style="margin:0 0 12px 0">
+      פעולה זו תסיר לצמיתות את התנועה הזו.
+    </p>
+    <div class="bar" style="gap:8px">
+      <button id="confirmNo"  class="btn">לא</button>
+      <button id="confirmYes" class="btn primary">כן</button>
+    </div>
+  </div>
+</div>
+  
   <!-- ספריית Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
   <!-- קובצי JS נפרדים -->
