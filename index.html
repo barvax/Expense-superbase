@@ -65,6 +65,10 @@
   <button id="addExpenseBtn" class="btn">+ הוצאה</button>
   <span class="spacer"></span>
 </div>
+<div class="bar" style="padding:0 16px">
+  <button id="openDetailsBtn" class="btn">צפה בפירוט החודשי</button>
+  <span class="spacer"></span>
+</div>
 
       <p id="hint" class="muted small">בחר/י חודש כדי לטעון נתונים.</p>
       <p id="err" class="msg err"></p>
@@ -131,6 +135,37 @@
   </div>
 </div>
 
+<!-- Modal: פירוט חודשי -->
+<div id="detailsDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="modal__card card">
+    <div class="bar" style="padding:0 0 12px 0">
+      <h2 class="title" id="detailsTitle">פירוט חודשי</h2>
+      <span class="spacer"></span>
+      <button id="closeDetailsBtn" class="btn">סגור ✕</button>
+    </div>
+
+    <!-- פילטרים -->
+    <div class="tabs" style="margin-bottom:8px">
+      <button id="fltAll" class="tab active" data-kind="all">הכול</button>
+      <button id="fltExpense" class="tab" data-kind="expense">הוצאות</button>
+      <button id="fltIncome" class="tab" data-kind="income">הכנסות</button>
+    </div>
+
+    <!-- סכומים -->
+    <div class="grid" style="margin-bottom:8px">
+      <div class="kpi"><h3>סה״כ הוצאות</h3><div id="sumExpense" class="val bad">₪0</div></div>
+      <div class="kpi"><h3>סה״כ הכנסות</h3><div id="sumIncome" class="val ok">₪0</div></div>
+      <div class="kpi"><h3>דלתא</h3><div id="sumDelta" class="val">₪0</div></div>
+    </div>
+
+    <!-- רשימת תנועות -->
+    <div id="detailsList" class="tx-list"></div>
+
+    <!-- תחתית -->
+    <div class="muted small" id="detailsHint" style="margin-top:8px"></div>
+  </div>
+</div>
 
   <!-- ספריית Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
@@ -138,6 +173,7 @@
   <script src="auth.js" type="module" defer></script>
   <script src="app.js" type="module" defer></script>
   <script src="forms.js" type="module" defer></script>
+   <script src="details.js" type="module" defer></script>
 
 </body>
 </html>

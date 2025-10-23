@@ -115,3 +115,35 @@ html { -webkit-text-size-adjust: 100%; }
   width:100%; padding:12px 14px; border-radius:12px;
   background:#0d1526; border:1px solid var(--border); color: var(--text);
 }
+/* רשימת תנועות בפירוט */
+.tx-list { display:grid; gap:8px; max-height: 100%; }
+.tx-row {
+  display:grid; grid-template-columns: 1fr auto; gap:8px;
+  border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:#0d1526;
+}
+.tx-main { display:flex; gap:8px; align-items:center; overflow:hidden; }
+.tx-emoji { font-size:20px; flex:0 0 auto; }
+.tx-text { display:grid; gap:2px; min-width:0; }
+.tx-title { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-note  { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-meta  { font-size:12px; color:var(--muted); }
+.tx-amt   { font-weight:800; }
+.tx-amt.ok  { color: var(--accent); }
+.tx-amt.bad { color: var(--danger); }
+
+/* tabs (אם לא קיים כבר) */
+.tabs { display:flex; gap:8px; border-bottom:1px solid var(--border); }
+.tab { padding:10px 12px; border:1px solid var(--border); border-bottom:none; background:#0d1526; color:#e5e7eb; border-radius:12px 12px 0 0; cursor:pointer; }
+.tab.active { background: var(--accent); color:#062c22; border-color: var(--accent); }
+
+/* גלילת מודאל חלקה בנייד (יש לך כבר, אבל ליתר ביטחון) */
+.modal__card {
+  position: fixed;
+  left: 16px; right: 16px;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  max-height: calc(100svh - 32px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.no-scroll { overflow:hidden; }
