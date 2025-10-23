@@ -3,138 +3,141 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>כניסה — ניהול תקציב משפחתי</title>
-  <style>
-    :root { --bg:#0b1220; --card:#111827; --muted:#9ca3af; --text:#f3f4f6; --accent:#10b981; --danger:#ef4444; --border:#1f2937; }
-    * { box-sizing: border-box; }
-    html, body { height:100%; }
-    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
-    .wrap { min-height:100%; display:grid; place-items:center; padding: 24px; }
-    .card { width:100%; max-width: 420px; background: var(--card); border:1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    h1 { margin: 0 0 8px 0; font-size: 20px; letter-spacing:.3px; }
-    p.muted { margin: 0 0 16px 0; color: var(--muted); font-size: 14px; }
-    label { display:block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
-    input { width:100%; padding: 12px 14px; border-radius: 12px; background:#0d1526; border:1px solid var(--border); color: var(--text); }
-    input::placeholder { color:#6b7280; }
-    button { width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--border); background: var(--accent); color:#062c22; font-weight:700; cursor:pointer; }
-    button:disabled { opacity:.6; cursor:not-allowed; }
-    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .err { color: var(--danger); font-size: 14px; min-height: 18px; margin-top: 8px; }
-    .success { color: var(--accent); font-size: 14px; }
-    .footer { margin-top: 16px; text-align:center; color: var(--muted); font-size: 12px; }
-    .hidden { display:none; }
-  </style>
+  <title>ניהול תקציב משפחתי</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="wrap">
-    <div class="card" id="loginCard">
-      <h1>ניהול תקציב משפחתי</h1>
-      <p class="muted">מסך כניסה</p>
-
+<body >
+   <section id="view-login" class="view active">
+<!-- מסך כניסה -->
+  <div id="loginScreen" class="wrap">
+    <div class="card">
+      <h1>ניהול תקציב משפחתי</h1> 
       <form id="loginForm" novalidate>
         <label for="email">אימייל</label>
         <input id="email" type="email" placeholder="name@example.com" autocomplete="username" required />
-
         <label for="password">סיסמה</label>
         <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
-
-        <div class="row" style="margin-top:16px">
-          <span id="status" class="success hidden">מחובר ✔︎</span>
-          <button id="loginBtn" type="submit">התחבר</button>
-        </div>
-        <div id="error" class="err"></div>
+        <button id="loginBtn" type="submit">התחבר</button>
+        <div id="loginError" class="msg err"></div>
       </form>
+    </div>
+  </div>
+   </section>
+  
 
-      <div id="signedInBox" class="hidden" style="margin-top:10px">
-        <div class="row">
-          <span class="success">מחובר כ־<b id="userEmail"></b></span>
-          <button id="logoutBtn" type="button" style="width:auto;background:#0d1526;color:#e5e7eb">התנתק</button>
+  <!-- מסך ראשי -->
+    <section id="view-home" class="view">
+  <div id="appScreen" class="hidden">
+    <header>
+      <div class="bar">
+        <h1 class="title">תקציב משפחתי — סיכום חודשי</h1>
+        <div class="spacer"></div>
+        <button id="logoutBtn" class="btn">יציאה</button>
+      </div>
+      <div class="bar sub">
+      <label class="muted">חודש</label>
+<div class="month-picker">
+  <select id="monthSelect"></select>
+  <select id="yearSelect"></select>
+</div>
+<span id="userEmail" class="muted small"></span>
+
+      </div>
+    </header>
+
+    <main>
+      <section class="grid">
+        <div class="kpi">
+          <h3>הכנסות</h3>
+          <div id="kpiIncome" class="val ok">₪0</div>
+        </div>
+        <div class="kpi">
+          <h3>הוצאות</h3>
+          <div id="kpiExpense" class="val bad">₪0</div>
+        </div>
+        <div class="kpi">
+          <h3>דלתא</h3>
+          <div id="kpiDelta" class="val">₪0</div>
+        </div>
+      </section>
+      <div class="bar" style="padding:0 16px">
+  <button id="addIncomeBtn" class="btn primary">+ הכנסה</button>
+  <button id="addExpenseBtn" class="btn">+ הוצאה</button>
+  <span class="spacer"></span>
+</div>
+
+      <p id="hint" class="muted small">בחר/י חודש כדי לטעון נתונים.</p>
+      <p id="err" class="msg err"></p>
+    </main>
+
+
+  </div>
+    </section>
+<!-- Modal: הוספת תנועה -->
+<div id="addDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="modal__card card">
+    <div class="bar" style="padding:0 0 12px 0">
+      <h2 class="title" id="addTitle">הוספת תנועה</h2>
+      <span class="spacer"></span>
+      <button id="closeAddBtn" class="btn">סגור ✕</button>
+    </div>
+
+    <!-- טאבים: הוצאה / הכנסה -->
+    <div class="tabs">
+      <button id="tabExpense" class="tab active">הוצאה</button>
+      <button id="tabIncome"  class="tab">הכנסה</button>
+    </div>
+
+    <!-- בחירת קטגוריה (להוצאה) -->
+    <div id="categoryPicker" class="picker">
+      <div id="categoryGrid" class="cat-grid"></div>
+      <div class="muted small" style="margin-top:6px">בחר/י קטגוריה להוצאה</div>
+    </div>
+
+    <!-- טופס פרטים -->
+    <form id="txForm" style="margin-top:12px">
+      <input type="hidden" id="txKind" value="expense" />
+      <input type="hidden" id="txCategoryId" />
+
+      <label>סכום (₪)</label>
+      <input id="txAmount" type="number" min="0" step="0.01" placeholder="לדוגמה: 2500" required />
+
+      <label>תאריך</label>
+      <input id="txDate" type="date" required />
+
+      <label>הערה (לא חובה)</label>
+      <input id="txNote" type="text" placeholder="תיאור קצר" />
+
+      <!-- מצב הוצאה -->
+      <div id="expenseModeBlock" class="field">
+        <label>סוג הוצאה</label>
+        <div class="seg">
+          <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
+          <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
         </div>
       </div>
 
-      <div class="footer">מותאם לנייד • זוכר התחברות במכשיר</div>
-    </div>
+      <div id="installmentsBlock" class="field hidden">
+        <label>מספר תשלומים</label>
+        <input id="txMonths" type="number" min="1" step="1" value="2" />
+      </div>
+
+      <div class="bar" style="padding:12px 0 0 0">
+        <button id="saveTxBtn" class="btn primary" type="submit">שמירה</button>
+        <span id="txErr" class="msg err"></span>
+      </div>
+    </form>
   </div>
+</div>
 
-  <!-- Supabase JS v2 -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    // 1) עדכן לפרויקט שלך
-    const SUPABASE_URL = "https://avhosytqnsqkrapnwhfq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2aG9zeXRxbnNxa3JhcG53aGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4MjMzMjMsImV4cCI6MjA3NjM5OTMyM30.j0fSPfrpOIlByTChwt1lrVx7bK6BVrl9c1Jt0_AEkPk";
 
-    // 2) יצירת לקוח עם שמירת סשן אוטומטית וריענון טוקנים
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
+  <!-- ספריית Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
+  <!-- קובצי JS נפרדים -->
+  <script src="auth.js" type="module" defer></script>
+  <script src="app.js" type="module" defer></script>
+  <script src="forms.js" type="module" defer></script>
 
-    // 3) DOM
-    const els = {
-      loginForm: document.getElementById('loginForm'),
-      email: document.getElementById('email'),
-      password: document.getElementById('password'),
-      loginBtn: document.getElementById('loginBtn'),
-      status: document.getElementById('status'),
-      error: document.getElementById('error'),
-      signedInBox: document.getElementById('signedInBox'),
-      userEmail: document.getElementById('userEmail'),
-      logoutBtn: document.getElementById('logoutBtn')
-    };
-
-    function showError(msg) { els.error.textContent = msg || ''; }
-    function setLoading(is) { els.loginBtn.disabled = !!is; }
-
-    function showSignedIn(email) {
-      els.signedInBox.classList.remove('hidden');
-      els.userEmail.textContent = email || '';
-      els.status.classList.remove('hidden');
-      showError('');
-    }
-    function showSignedOut() {
-      els.signedInBox.classList.add('hidden');
-      els.userEmail.textContent = '';
-      els.status.classList.add('hidden');
-    }
-
-    // 4) טופס כניסה (Email + Password)
-    els.loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      try {
-        const email = els.email.value.trim();
-        const password = els.password.value;
-        if (!email || !password) throw new Error('נא להזין אימייל וסיסמה');
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        // onAuthStateChange יעדכן UI
-      } catch (err) {
-        showError('שגיאה: ' + (err?.message || err));
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    // 5) Logout
-    els.logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      showSignedOut();
-    });
-
-    // 6) האזנה לסשן — זוכר התחברות אוטומטית
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        showSignedIn(session.user.email);
-        // TODO: בעתיד: window.location.href = '/app.html';
-      } else {
-        showSignedOut();
-      }
-    });
-
-    // 7) אתחול — במידה וקיים סשן שמור, זה יספיק כדי לזהות
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) showSignedIn(session.user.email); else showSignedOut();
-    })();
-  </script>
 </body>
 </html>

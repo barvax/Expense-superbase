@@ -1,0 +1,81 @@
+:root { --bg:#0b1220; --card:#111827; --muted:#9ca3af; --text:#f3f4f6; --accent:#10b981; --warn:#f59e0b; --danger:#ef4444; --border:#1f2937; }
+* { box-sizing: border-box; }
+html, body { height:100%; margin:0; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+/* מניעת הבהוב לפני בדיקת סשן */
+.app-hidden { visibility: hidden; }
+
+/* Utility */
+.hidden { display:none; }
+.small { font-size:12px; }
+.muted { color: var(--muted); }
+.msg.err { color: var(--danger); font-size:14px; min-height:18px; }
+
+/* Login */
+.wrap { display:grid; place-items:center; min-height:100vh; padding:24px; }
+.card { background: var(--card); border:1px solid var(--border); border-radius: 16px; padding: 20px; width:100%; max-width:420px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+h1 { margin:0 0 12px 0; font-size:22px; text-align:center; }
+label { display:block; font-size:13px; color: var(--muted); margin: 10px 0 6px; }
+input { width:100%; padding:12px 14px; border-radius:12px; background:#0d1526; border:1px solid var(--border); color: var(--text); }
+button { width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background: var(--accent); color:#062c22; font-weight:700; cursor:pointer; }
+button:disabled { opacity:.6; cursor:not-allowed; }
+
+/* App */
+header { background: linear-gradient(180deg, rgba(11,18,32,.98), rgba(11,18,32,.92)); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:5; }
+.bar { display:flex; align-items:center; gap:12px; padding:14px 16px; }
+.bar.sub { border-top:1px solid var(--border); }
+.title { margin:0; font-size:18px; letter-spacing:.3px; }
+.btn { padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0d1526; color:#e5e7eb; cursor:pointer; width:auto; }
+.btn.primary { background:var(--accent); color:#062c22; border-color: var(--accent); font-weight:700; }
+.spacer { flex:1; }
+main { padding:16px; display:grid; gap:16px; max-width:720px; margin:0 auto; }
+.grid { display:grid; grid-template-columns: repeat(2,1fr); gap:12px; }
+@media (min-width: 680px) { .grid { grid-template-columns: repeat(3,1fr); } }
+.kpi { border:1px solid var(--border); border-radius:14px; padding:12px; display:grid; gap:4px; }
+.kpi h3 { margin:0; font-size:14px; color: var(--muted); }
+.kpi .val { font-size:20px; font-weight:800; }
+.ok { color: var(--accent); }
+.bad { color: var(--danger); }
+/* ניהול מסכים */
+.view { display: none; }
+.view.active { display: block; }
+
+/* למנוע פלאש לפני בדיקת סשן */
+.app-hidden { visibility: hidden; }
+
+/* Modal */
+.modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 50; }
+.modal.hidden { display: none; }
+.modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(2px); }
+.modal__card { position: relative; width: 100%; max-width: 720px; z-index: 51; }
+
+/* Tabs */
+.tabs { display:flex; gap:8px; border-bottom:1px solid var(--border); margin-bottom:10px; }
+.tab { flex:1; padding:10px 12px; border:1px solid var(--border); border-bottom:none; background:#0d1526; color:#e5e7eb; border-radius:12px 12px 0 0; cursor:pointer; }
+.tab.active { background: var(--accent); color:#062c22; border-color: var(--accent); font-weight:700; }
+
+/* Category grid */
+.picker { margin: 8px 0 6px; }
+.cat-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (min-width: 680px) { .cat-grid { grid-template-columns: repeat(6, 1fr); } }
+.cat-tile { display:grid; gap:4px; place-items:center; padding:10px; border:1px solid var(--border); border-radius:12px; background:#0d1526; cursor:pointer; text-align:center; }
+.cat-tile--active { outline:2px solid var(--accent); }
+.cat-emoji { font-size:22px; }
+.cat-name  { font-size:12px; color:var(--text); }
+
+/* Segmented control */
+.seg { display:flex; gap:6px; }
+.seg__btn { padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:#0d1526; color:#e5e7eb; cursor:pointer; }
+.seg__btn--active { background: var(--accent); color:#062c22; border-color: var(--accent); }
+
+/* טופס מודאל – אם חסר */
+#addDialog form label { display:block; font-size:13px; color:var(--muted); margin: 10px 0 6px; }
+#addDialog form input, #addDialog form select {
+  width:100%; padding:12px 14px; border-radius:12px;
+  background:#0d1526; border:1px solid var(--border); color: var(--text);
+}
+.month-picker { display:flex; gap:8px; align-items:center; }
+.month-picker select {
+  background:#0d1526; color:#e5e7eb; border:1px solid var(--border);
+  border-radius:10px; padding:8px 10px;
+}
