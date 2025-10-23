@@ -57,7 +57,7 @@ const els = {
 };
 
 // --- עזרי UI/זמן ---
-function showModal(show){ els.addDialog.classList.toggle("hidden", !show); }
+//function showModal(show){ els.addDialog.classList.toggle("hidden", !show); }
 function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function clearActiveTiles(){ [...els.categoryGrid.querySelectorAll('.cat-tile')].forEach(n=>n.classList.remove('cat-tile--active')); }
 
