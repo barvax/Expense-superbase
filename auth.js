@@ -55,9 +55,9 @@ const logoutBtn  = document.getElementById("logoutBtn");
 sb.auth.onAuthStateChange((_event, session) => {
   if (session?.user) {
     if (userEmail) userEmail.textContent = session.user.email || "";
-    setActive("home");
+    goTo('view-home');
   } else {
-    setActive("login");
+     goTo('view-login');
   }
 });
 
@@ -85,3 +85,4 @@ loginForm?.addEventListener("submit", async (e) => {
 logoutBtn?.addEventListener("click", async () => {
   await sb.auth.signOut();
 });
+

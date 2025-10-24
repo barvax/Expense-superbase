@@ -2,192 +2,257 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>ניהול תקציב משפחתי</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body >
-   <section id="view-login" class="view active">
-<!-- מסך כניסה -->
-  <div id="loginScreen" class="wrap">
-    <div class="card">
-      <h1>ניהול תקציב משפחתי</h1> 
-      <form id="loginForm" novalidate>
-        <label for="email">אימייל</label>
-        <input id="email" type="email" placeholder="name@example.com" autocomplete="username" required />
-        <label for="password">סיסמה</label>
-        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
-        <button id="loginBtn" type="submit">התחבר</button>
-        <div id="loginError" class="msg err"></div>
+<body>
+
+  <!-- =============== מסך כניסה =============== -->
+  <section id="view-login" class="view active">
+    <div id="loginScreen" class="wrap">
+      <div class="card">
+        <h1>ניהול תקציב משפחתי</h1>
+        <form id="loginForm" novalidate>
+          <label for="email">אימייל</label>
+          <input id="email" type="email" placeholder="name@example.com" autocomplete="username" required />
+
+          <label for="password">סיסמה</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+
+          <button id="loginBtn" type="submit">התחבר</button>
+          <div id="loginError" class="msg err"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== מסך בית (סיכום חודשי) =============== -->
+  <section id="view-home" class="view">
+    <div id="appScreen">
+      <header>
+        <div class="bar">
+          <h1 class="title">תקציב משפחתי — סיכום חודשי</h1>
+          <div class="spacer"></div>
+          <button id="logoutBtn" class="btn">יציאה</button>
+        </div>
+
+        <div class="bar sub">
+          <label class="muted">חודש</label>
+          <div class="month-picker">
+            <select id="monthSelect"></select>
+            <select id="yearSelect"></select>
+          </div>
+          <span id="userEmail" class="muted small"></span>
+        </div>
+      </header>
+
+      <main>
+        <section class="grid">
+          <div class="kpi">
+            <h3>הכנסות</h3>
+            <div id="kpiIncome" class="val ok">₪0</div>
+          </div>
+          <div class="kpi">
+            <h3>הוצאות</h3>
+            <div id="kpiExpense" class="val bad">₪0</div>
+          </div>
+          <div class="kpi">
+            <h3>דלתא</h3>
+            <div id="kpiDelta" class="val">₪0</div>
+          </div>
+        </section>
+
+        <div class="bar" style="padding:0 16px">
+          <button id="addIncomeBtn" class="btn primary">+ הכנסה</button>
+          <button id="addExpenseBtn" class="btn">+ הוצאה</button>
+          <span class="spacer"></span>
+        </div>
+
+        <div class="bar" style="padding:0 16px">
+          <button id="openDetailsBtn" class="btn">צפה בפירוט החודשי</button>
+          <span class="spacer"></span>
+        </div>
+
+        <div class="bar" style="padding:0 16px">
+          <button id="openBudgetBtn" class="btn">📊 בנה תקציב</button>
+          <button id="openBudgetSummaryBtn" class="btn">🔎 סיכום תקציב</button>
+          <span class="spacer"></span>
+        </div>
+
+        <p id="hint" class="muted small">בחר/י חודש כדי לטעון נתונים.</p>
+        <p id="err" class="msg err"></p>
+      </main>
+    </div>
+  </section>
+
+  <!-- =============== מסך: בנה תקציב =============== -->
+  <section id="view-budget" class="view">
+    <div class="bar">
+      <button id="budgetBackBtn" class="btn">⬅ חזרה</button>
+      <h2 class="title">בנה תקציב</h2>
+      <span class="spacer"></span>
+      <div class="month-picker">
+        <input id="budgetMonth" type="month" />
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar" style="gap:8px">
+        <button id="copyFromBtn" class="btn">העתק מחודש...</button>
+        <input id="copyFromMonth" type="month" />
+        <span class="spacer"></span>
+        <button id="saveBudgetBtn" class="btn primary">שמירת תקציב</button>
+      </div>
+
+      <div id="budgetList" class="budget-list" style="margin-top:12px"></div>
+
+      <div class="bar" style="margin-top:12px">
+        <b>סה״כ תקציב:</b>
+        <span id="budgetTotal" style="margin-inline-start:8px">₪0</span>
+        <span class="spacer"></span>
+        <span id="budgetMsg" class="msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== מסך: סיכום תקציב =============== -->
+  <section id="view-budget-summary" class="view">
+    <div class="bar">
+      <button id="budgetSummaryBackBtn" class="btn">⬅ חזרה</button>
+      <h2 class="title">סיכום תקציב</h2>
+      <span class="spacer"></span>
+      <div class="month-picker">
+        <input id="summaryMonth" type="month" />
+      </div>
+    </div>
+
+    <div id="summaryList" class="card" style="margin-top:12px; padding:12px"></div>
+  </section>
+
+  <!-- =============== מודאל: הוספת תנועה =============== -->
+  <div id="addDialog" class="modal hidden">
+    <div class="modal__backdrop"></div>
+    <div class="modal__card card">
+      <div class="bar" style="padding:0 0 12px 0">
+        <h2 class="title" id="addTitle">הוספת תנועה</h2>
+        <span class="spacer"></span>
+        <button id="closeAddBtn" class="btn">סגור ✕</button>
+      </div>
+
+      <!-- טאבים: הוצאה / הכנסה -->
+      <div class="tabs">
+        <button id="tabExpense" class="tab active">הוצאה</button>
+        <button id="tabIncome" class="tab">הכנסה</button>
+      </div>
+
+      <!-- בחירת קטגוריה (להוצאה) -->
+      <div id="categoryPicker" class="picker">
+        <div id="categoryGrid" class="cat-grid"></div>
+        <div class="muted small" style="margin-top:6px">בחר/י קטגוריה להוצאה</div>
+      </div>
+
+      <!-- טופס פרטים -->
+      <form id="txForm" style="margin-top:12px">
+        <input type="hidden" id="txKind" value="expense" />
+        <input type="hidden" id="txCategoryId" />
+
+        <label>סכום (₪)</label>
+        <input id="txAmount" type="number" min="0" step="0.01" placeholder="לדוגמה: 2500" required />
+
+        <label>תאריך</label>
+        <input id="txDate" type="date" required />
+
+        <label>הערה (לא חובה)</label>
+        <input id="txNote" type="text" placeholder="תיאור קצר" />
+
+        <!-- מצב הוצאה -->
+        <div id="expenseModeBlock" class="field">
+          <label>סוג הוצאה</label>
+          <div class="seg">
+            <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
+            <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
+          </div>
+        </div>
+
+        <div id="installmentsBlock" class="field hidden">
+          <label>מספר תשלומים</label>
+          <input id="txMonths" type="number" min="1" step="1" value="2" />
+        </div>
+
+        <div class="bar" style="padding:12px 0 0 0">
+          <button id="saveTxBtn" class="btn primary" type="submit">שמירה</button>
+          <span id="txErr" class="msg err"></span>
+        </div>
       </form>
     </div>
   </div>
-   </section>
-  
 
-  <!-- מסך ראשי -->
-    <section id="view-home" class="view">
-  <div id="appScreen" class="hidden">
-    <header>
-      <div class="bar">
-        <h1 class="title">תקציב משפחתי — סיכום חודשי</h1>
-        <div class="spacer"></div>
-        <button id="logoutBtn" class="btn">יציאה</button>
+  <!-- =============== מודאל: פירוט חודשי =============== -->
+  <div id="detailsDialog" class="modal hidden">
+    <div class="modal__backdrop"></div>
+    <div class="modal__card card">
+      <div class="bar" style="padding:0 0 12px 0">
+        <h2 class="title" id="detailsTitle">פירוט חודשי</h2>
+        <span class="spacer"></span>
+        <button id="closeDetailsBtn" class="btn">סגור ✕</button>
       </div>
-      <div class="bar sub">
-      <label class="muted">חודש</label>
-<div class="month-picker">
-  <select id="monthSelect"></select>
-  <select id="yearSelect"></select>
-</div>
-<span id="userEmail" class="muted small"></span>
 
+      <!-- פילטרים -->
+      <div class="tabs" style="margin-bottom:8px">
+        <button id="fltAll" class="tab active" data-kind="all">הכול</button>
+        <button id="fltExpense" class="tab" data-kind="expense">הוצאות</button>
+        <button id="fltIncome" class="tab" data-kind="income">הכנסות</button>
       </div>
-    </header>
 
-    <main>
-      <section class="grid">
+      <!-- סכומים -->
+      <div class="grid" style="margin-bottom:8px">
         <div class="kpi">
-          <h3>הכנסות</h3>
-          <div id="kpiIncome" class="val ok">₪0</div>
+          <h3>סה״כ הוצאות</h3>
+          <div id="sumExpense" class="val bad">₪0</div>
         </div>
         <div class="kpi">
-          <h3>הוצאות</h3>
-          <div id="kpiExpense" class="val bad">₪0</div>
+          <h3>סה״כ הכנסות</h3>
+          <div id="sumIncome" class="val ok">₪0</div>
         </div>
         <div class="kpi">
           <h3>דלתא</h3>
-          <div id="kpiDelta" class="val">₪0</div>
-        </div>
-      </section>
-      <div class="bar" style="padding:0 16px">
-  <button id="addIncomeBtn" class="btn primary">+ הכנסה</button>
-  <button id="addExpenseBtn" class="btn">+ הוצאה</button>
-  <span class="spacer"></span>
-</div>
-<div class="bar" style="padding:0 16px">
-  <button id="openDetailsBtn" class="btn">צפה בפירוט החודשי</button>
-  <span class="spacer"></span>
-</div>
-
-      <p id="hint" class="muted small">בחר/י חודש כדי לטעון נתונים.</p>
-      <p id="err" class="msg err"></p>
-    </main>
-
-
-  </div>
-    </section>
-<!-- Modal: הוספת תנועה -->
-<div id="addDialog" class="modal hidden">
-  <div class="modal__backdrop"></div>
-  <div class="modal__card card">
-    <div class="bar" style="padding:0 0 12px 0">
-      <h2 class="title" id="addTitle">הוספת תנועה</h2>
-      <span class="spacer"></span>
-      <button id="closeAddBtn" class="btn">סגור ✕</button>
-    </div>
-
-    <!-- טאבים: הוצאה / הכנסה -->
-    <div class="tabs">
-      <button id="tabExpense" class="tab active">הוצאה</button>
-      <button id="tabIncome"  class="tab">הכנסה</button>
-    </div>
-
-    <!-- בחירת קטגוריה (להוצאה) -->
-    <div id="categoryPicker" class="picker">
-      <div id="categoryGrid" class="cat-grid"></div>
-      <div class="muted small" style="margin-top:6px">בחר/י קטגוריה להוצאה</div>
-    </div>
-
-    <!-- טופס פרטים -->
-    <form id="txForm" style="margin-top:12px">
-      <input type="hidden" id="txKind" value="expense" />
-      <input type="hidden" id="txCategoryId" />
-
-      <label>סכום (₪)</label>
-      <input id="txAmount" type="number" min="0" step="0.01" placeholder="לדוגמה: 2500" required />
-
-      <label>תאריך</label>
-      <input id="txDate" type="date" required />
-
-      <label>הערה (לא חובה)</label>
-      <input id="txNote" type="text" placeholder="תיאור קצר" />
-
-      <!-- מצב הוצאה -->
-      <div id="expenseModeBlock" class="field">
-        <label>סוג הוצאה</label>
-        <div class="seg">
-          <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
-          <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
+          <div id="sumDelta" class="val">₪0</div>
         </div>
       </div>
 
-      <div id="installmentsBlock" class="field hidden">
-        <label>מספר תשלומים</label>
-        <input id="txMonths" type="number" min="1" step="1" value="2" />
+      <!-- רשימת תנועות -->
+      <div id="detailsList" class="tx-list"></div>
+
+      <!-- תחתית -->
+      <div class="muted small" id="detailsHint" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- =============== מודאל: אישור מחיקה =============== -->
+  <div id="confirmDialog" class="modal hidden">
+    <div class="modal__backdrop"></div>
+    <div class="confirm__card card">
+      <h3 class="title" style="margin-top:0">למחוק את התנועה?</h3>
+      <p id="confirmText" class="muted small" style="margin:0 0 12px 0">
+        פעולה זו תסיר לצמיתות את התנועה הזו.
+      </p>
+      <div class="bar" style="gap:8px">
+        <button id="confirmNo"  class="btn">לא</button>
+        <button id="confirmYes" class="btn primary">כן</button>
       </div>
-
-      <div class="bar" style="padding:12px 0 0 0">
-        <button id="saveTxBtn" class="btn primary" type="submit">שמירה</button>
-        <span id="txErr" class="msg err"></span>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal: פירוט חודשי -->
-<div id="detailsDialog" class="modal hidden">
-  <div class="modal__backdrop"></div>
-  <div class="modal__card card">
-    <div class="bar" style="padding:0 0 12px 0">
-      <h2 class="title" id="detailsTitle">פירוט חודשי</h2>
-      <span class="spacer"></span>
-      <button id="closeDetailsBtn" class="btn">סגור ✕</button>
-    </div>
-
-    <!-- פילטרים -->
-    <div class="tabs" style="margin-bottom:8px">
-      <button id="fltAll" class="tab active" data-kind="all">הכול</button>
-      <button id="fltExpense" class="tab" data-kind="expense">הוצאות</button>
-      <button id="fltIncome" class="tab" data-kind="income">הכנסות</button>
-    </div>
-
-    <!-- סכומים -->
-    <div class="grid" style="margin-bottom:8px">
-      <div class="kpi"><h3>סה״כ הוצאות</h3><div id="sumExpense" class="val bad">₪0</div></div>
-      <div class="kpi"><h3>סה״כ הכנסות</h3><div id="sumIncome" class="val ok">₪0</div></div>
-      <div class="kpi"><h3>דלתא</h3><div id="sumDelta" class="val">₪0</div></div>
-    </div>
-
-    <!-- רשימת תנועות -->
-    <div id="detailsList" class="tx-list"></div>
-
-    <!-- תחתית -->
-    <div class="muted small" id="detailsHint" style="margin-top:8px"></div>
-  </div>
-</div>
-<!-- Modal: אישור מחיקה -->
-<div id="confirmDialog" class="modal hidden">
-  <div class="modal__backdrop"></div>
-  <div class="confirm__card card">
-    <h3 class="title" style="margin-top:0">למחוק את התנועה?</h3>
-    <p id="confirmText" class="muted small" style="margin:0 0 12px 0">
-      פעולה זו תסיר לצמיתות את התנועה הזו.
-    </p>
-    <div class="bar" style="gap:8px">
-      <button id="confirmNo"  class="btn">לא</button>
-      <button id="confirmYes" class="btn primary">כן</button>
     </div>
   </div>
-</div>
-  
+
   <!-- ספריית Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
-  <!-- קובצי JS נפרדים -->
+
+  <!-- קובצי JS -->
+   <script src="utils.js" type="module" defer></script>
   <script src="auth.js" type="module" defer></script>
   <script src="app.js" type="module" defer></script>
   <script src="forms.js" type="module" defer></script>
-   <script src="details.js" type="module" defer></script>
-
+  <script src="details.js" type="module" defer></script>
+  <script src="budget.js" type="module" defer></script>
 </body>
 </html>
