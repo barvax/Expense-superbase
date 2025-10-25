@@ -77,6 +77,7 @@
         <div class="bar" style="padding:0 16px">
           <button id="openBudgetBtn" class="btn">📊 בנה תקציב</button>
           <button id="openBudgetSummaryBtn" class="btn">🔎 סיכום תקציב</button>
+          <button id="openKidsBtn" class="btn">👨‍👩‍👧 תקציב ילדים</button>
           <span class="spacer"></span>
         </div>
 
@@ -130,6 +131,30 @@
     <div id="summaryList" class="card" style="margin-top:12px; padding:12px"></div>
   </section>
 
+<!-- =============== מסך: תקציב ילדים =============== -->
+<section id="view-kids" class="view">
+  <div class="bar">
+    <button id="kidsBackBtn" class="btn">⬅ חזרה</button>
+    <h2 class="title">תקציב ילדים</h2>
+    <span class="spacer"></span>
+    <button id="addKidBtn" class="btn primary">+ הוסף ילד</button>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div id="kidsList" class="kids-grid"></div>
+  </div>
+
+  <div id="kidsLogWrap" class="card" style="margin-top:12px; display:none">
+    <div class="bar">
+      <h3 id="kidsLogTitle" class="title" style="margin:0">יומן פעולות</h3>
+      <span class="spacer"></span>
+      <button id="closeKidsLog" class="btn">סגור</button>
+    </div>
+    <div id="kidsLog" class="kids-log"></div>
+  </div>
+</section>
+
+
   <!-- =============== מודאל: הוספת תנועה =============== -->
   <div id="addDialog" class="modal hidden">
     <div class="modal__backdrop"></div>
@@ -174,6 +199,7 @@
   <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
   <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
   <button type="button" data-mode="recurring" class="seg__btn">הוצאה קבועה</button>
+    
 </div>
 
         </div>
@@ -246,6 +272,84 @@
       </div>
     </div>
   </div>
+<!-- מודאל: הוספת ילד -->
+<div id="addKidDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="modal__card card">
+    <div class="bar" style="padding:0 0 12px 0">
+      <h2 class="title" style="margin:0">הוסף ילד</h2>
+      <span class="spacer"></span>
+      <button id="closeAddKid" class="btn">סגור ✕</button>
+    </div>
+    <form id="addKidForm">
+      <label>שם הילד</label>
+      <input id="kidName" type="text" placeholder="לדוגמה: נועם" required />
+      <div class="bar" style="padding-top:12px">
+        <button id="saveKidBtn" class="btn primary" type="submit">שמירה</button>
+        <span id="addKidErr" class="msg err"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- מודאל: תנועה לילד (הוספה/הורדה) -->
+<div id="kidEntryDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="modal__card card">
+    <div class="bar" style="padding:0 0 12px 0">
+      <h2 id="kidEntryTitle" class="title" style="margin:0">תנועה</h2>
+      <span class="spacer"></span>
+      <button id="closeKidEntry" class="btn">סגור ✕</button>
+    </div>
+    <form id="kidEntryForm">
+      <input type="hidden" id="kidEntryChildId" />
+      <input type="hidden" id="kidEntryType" value="add" /> <!-- add | sub -->
+
+      <label>סכום (₪)</label>
+      <input id="kidAmount" type="number" min="0" step="0.01" placeholder="למשל: 50" required />
+
+      <label>תאריך</label>
+      <input id="kidDate" type="date" required />
+
+      <label>הערה (לא חובה)</label>
+      <input id="kidNote" type="text" placeholder="סיבה / תיאור" />
+
+      <div class="bar" style="padding-top:12px">
+        <button id="saveKidEntryBtn" class="btn primary" type="submit">שמירה</button>
+        <span id="kidEntryErr" class="msg err"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- מודאל: אישור מחיקת ילד -->
+<div id="confirmKidDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="confirm__card card">
+    <h3 class="title" style="margin-top:0">למחוק את הילד?</h3>
+    <p class="muted small" style="margin:0 0 12px 0">
+      פעולה זו תמחק גם את כל יומן הפעולות של הילד.
+    </p>
+    <div class="bar" style="gap:8px">
+      <button id="confirmKidNo" class="btn">לא</button>
+      <button id="confirmKidYes" class="btn primary">כן</button>
+    </div>
+  </div>
+</div>
+<!-- מודאל: אישור מחיקת תנועה של ילד -->
+<div id="confirmKidTxDialog" class="modal hidden">
+  <div class="modal__backdrop"></div>
+  <div class="confirm__card card">
+    <h3 class="title" style="margin-top:0">למחוק את התנועה?</h3>
+    <p class="muted small" style="margin:0 0 12px 0">
+      פעולה זו תמחק לצמיתות את התנועה מהיומן.
+    </p>
+    <div class="bar" style="gap:8px">
+      <button id="confirmKidTxNo" class="btn">לא</button>
+      <button id="confirmKidTxYes" class="btn primary">כן</button>
+    </div>
+  </div>
+</div>
 
   <!-- ספריית Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
@@ -257,5 +361,7 @@
   <script src="forms.js" type="module" defer></script>
   <script src="details.js" type="module" defer></script>
   <script src="budget.js" type="module" defer></script>
+  <script src="kids.js" type="module" defer></script>
+
 </body>
 </html>
