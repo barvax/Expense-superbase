@@ -25,17 +25,15 @@ function selectedHomeYM() {
 const monthStart = (ym) => `${ym}-01`;
 function firstOfNextMonthFrom(ym) {
   const [y, m] = ym.split('-').map(Number);
-  const d = new Date(y, m, 1); // JS: month is 0-based → m here is current month (1-12) → new Date(y,m,1) = first of next month
+  const d = new Date(y, m, 1);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
 }
 
 /* ----------------------- אלמנטים ----------------------- */
 const els = {
-  // כפתורים מהבית
   openBudgetBtn: document.getElementById('openBudgetBtn'),
   openBudgetSummaryBtn: document.getElementById('openBudgetSummaryBtn'),
 
-  // מסך "בנה תקציב"
   vBudget: document.getElementById('view-budget'),
   budgetBackBtn: document.getElementById('budgetBackBtn'),
   budgetMonth: document.getElementById('budgetMonth'),
@@ -46,7 +44,6 @@ const els = {
   budgetTotal: document.getElementById('budgetTotal'),
   budgetMsg: document.getElementById('budgetMsg'),
 
-  // מסך "סיכום תקציב"
   vSummary: document.getElementById('view-budget-summary'),
   summaryBackBtn: document.getElementById('budgetSummaryBackBtn'),
   summaryMonth: document.getElementById('summaryMonth'),
@@ -66,14 +63,28 @@ async function loadExpenseCategories(sb) {
 
 async function loadBudgetsForMonth(sb, ym) {
   const first = monthStart(ym);
-  const { data, error } = await sb
+
+  // 1️⃣ טען את התקציבים שהוגדרו לחודש הזה
+  const { data: budgetData, error: budgetErr } = await sb
     .from('monthly_budgets')
     .select('category_id, amount_cents')
     .eq('month', first);
-  if (error) throw error;
-  const map = new Map();
-  (data || []).forEach(b => map.set(b.category_id, b.amount_cents || 0));
-  return map;
+  if (budgetErr) throw budgetErr;
+
+  const budgetMap = new Map();
+  (budgetData || []).forEach(b => budgetMap.set(b.category_id, b.amount_cents || 0));
+
+  // 2️⃣ טען גם את ההוצאות בפועל (רק חד-פעמיות!)
+  const { data: spentData, error: spentErr } = await sb
+    .from('v_monthly_category_spend_regular')
+    .select('*')
+    .eq('month', first);
+  if (spentErr) throw spentErr;
+
+  const spentMap = new Map();
+  (spentData || []).forEach(r => spentMap.set(r.category_id, r.spent_cents || 0));
+
+  return { budgetMap, spentMap };
 }
 
 async function saveBudgets(sb, ym) {
@@ -102,8 +113,9 @@ async function saveBudgets(sb, ym) {
         .upsert(upserts, { onConflict: 'user_id,category_id,month' });
       if (error) throw error;
     }
+
     els.budgetMsg.textContent = 'נשמר ✔';
-    window.dispatchEvent(new Event('tx-changed')); // רענון כללי למאזינים
+    window.dispatchEvent(new Event('tx-changed'));
   } catch (err) {
     console.error(err);
     els.budgetMsg.textContent = 'שגיאה: ' + (err?.message || err);
@@ -144,13 +156,12 @@ async function copyBudgetFromMonth(sb, fromYM, toYM) {
   els.budgetMsg.textContent = 'הועתק ✔';
 
   const cats = await loadExpenseCategories(sb);
-  const map  = await loadBudgetsForMonth(sb, toYM);
-  renderBudgetRows(cats, map);
+  const maps = await loadBudgetsForMonth(sb, toYM);
+  renderBudgetRows(cats, maps.budgetMap);
 }
 
 async function loadSummary(sb, ym) {
   const first = monthStart(ym);
-  const nextFirst = firstOfNextMonthFrom(ym);
 
   // תקציב לפי קטגוריה
   const { data: budgets, error: bErr } = await sb
@@ -160,20 +171,15 @@ async function loadSummary(sb, ym) {
   if (bErr) throw bErr;
   const budgetByCat = new Map((budgets || []).map(b => [b.category_id, b.amount_cents || 0]));
 
-  // הוצאות לחודש זה בקבוצות
+  // הוצאות בפועל (רק חד-פעמיות) לפי ה-View החדש
   const { data: spentRows, error: sErr } = await sb
-    .from('transactions')
-    .select('category_id, amount_cents')
-    .eq('kind','expense')
-    .gte('occurred_at', first)
-    .lt('occurred_at', nextFirst);
+    .from('v_monthly_category_spend_regular')
+    .select('category_id, spent_cents')
+    .eq('month', first);
   if (sErr) throw sErr;
 
   const spentByCat = new Map();
-  (spentRows || []).forEach(t => {
-    const prev = spentByCat.get(t.category_id) || 0;
-    spentByCat.set(t.category_id, prev + (t.amount_cents || 0));
-  });
+  (spentRows || []).forEach(r => spentByCat.set(r.category_id, r.spent_cents || 0));
 
   // קטגוריות לשמות/אייקון
   const { data: cats, error: cErr } = await sb
@@ -183,6 +189,7 @@ async function loadSummary(sb, ym) {
     .order('name');
   if (cErr) throw cErr;
 
+  // בניית פריט-פר-קטגוריה
   els.summaryList.innerHTML = (cats || []).map(c => {
     const budget = budgetByCat.get(c.id) || 0;
     const spent  = spentByCat.get(c.id) || 0;
@@ -205,6 +212,31 @@ async function loadSummary(sb, ym) {
     `;
   }).join('');
 
+  // --- סה״כ כללי בתחתית ---
+  let totalBudget = 0, totalSpent = 0;
+  (cats || []).forEach(c => {
+    totalBudget += budgetByCat.get(c.id) || 0;
+    totalSpent  += spentByCat.get(c.id) || 0;
+  });
+  const totalLeft = Math.max(0, totalBudget - totalSpent);
+  const totalPct  = totalBudget > 0 ? Math.min(100, Math.round((totalSpent / totalBudget) * 100)) : (totalSpent > 0 ? 100 : 0);
+  const totalOver = totalSpent > totalBudget;
+
+  els.summaryList.insertAdjacentHTML('beforeend', `
+    <hr class="sum-sep" />
+    <div class="cat-item total">
+      <div class="cat-head">
+        <div class="cat-name">סה״כ</div>
+        <div class="cat-figs">
+          הוקצב: ${toILS(totalBudget)} · הוצא: ${toILS(totalSpent)} · נשאר: ${toILS(totalLeft)}
+        </div>
+      </div>
+      <div class="prog ${totalOver ? 'over' : ''}">
+        <div class="fill" style="width:${totalPct}%"></div>
+      </div>
+    </div>
+  `);
+
   // חיווי כללי על חריגות (אופציונלי)
   const overs = (cats || []).filter(c => (spentByCat.get(c.id) || 0) > (budgetByCat.get(c.id) || 0));
   if (overs.length && els.budgetMsg && els.vBudget.classList.contains('active')) {
@@ -212,7 +244,7 @@ async function loadSummary(sb, ym) {
   }
 }
 
-/* ----------------------- UI: רנדר/חישוב ----------------------- */
+/* ----------------------- UI ----------------------- */
 function renderBudgetRows(cats, existingBudgetsMap) {
   els.budgetList.innerHTML = (cats || []).map(c => {
     const centsVal = existingBudgetsMap.get(c.id) ?? 0;
@@ -226,9 +258,7 @@ function renderBudgetRows(cats, existingBudgetsMap) {
   }).join('');
 
   recalcTotal();
-  els.budgetList.querySelectorAll('.amt').forEach(inp => {
-    inp.addEventListener('input', recalcTotal);
-  });
+  els.budgetList.querySelectorAll('.amt').forEach(inp => inp.addEventListener('input', recalcTotal));
 }
 
 function recalcTotal() {
@@ -249,8 +279,8 @@ function recalcTotal() {
     els.budgetMonth.value = ym;
 
     const cats = await loadExpenseCategories(sb);
-    const map  = await loadBudgetsForMonth(sb, ym);
-    renderBudgetRows(cats, map);
+    const maps = await loadBudgetsForMonth(sb, ym);
+    renderBudgetRows(cats, maps.budgetMap);
 
     goTo('view-budget');
   });
@@ -263,23 +293,20 @@ function recalcTotal() {
     goTo('view-budget-summary');
   });
 
-  // חזרה
   els.budgetBackBtn?.addEventListener('click', () => goTo('view-home'));
   els.summaryBackBtn?.addEventListener('click', () => goTo('view-home'));
 
-  // שינוי חודש במסכי התקציב/סיכום
   els.budgetMonth?.addEventListener('change', async () => {
     const ym = els.budgetMonth.value;
     const cats = await loadExpenseCategories(sb);
-    const map  = await loadBudgetsForMonth(sb, ym);
-    renderBudgetRows(cats, map);
+    const maps = await loadBudgetsForMonth(sb, ym);
+    renderBudgetRows(cats, maps.budgetMap);
   });
 
   els.summaryMonth?.addEventListener('change', async () => {
     await loadSummary(sb, els.summaryMonth.value);
   });
 
-  // העתקה מחודש אחר
   els.copyFromBtn?.addEventListener('click', async () => {
     const fromYM = els.copyFromMonth.value;
     const toYM   = els.budgetMonth.value;
@@ -290,12 +317,10 @@ function recalcTotal() {
     await copyBudgetFromMonth(sb, fromYM, toYM);
   });
 
-  // שמירה
   els.saveBudgetBtn?.addEventListener('click', async () => {
     await saveBudgets(sb, els.budgetMonth.value);
   });
 
-  // אם נוספה תנועה חדשה בזמן שהסיכום פתוח → רענון
   window.addEventListener('tx-changed', async () => {
     if (document.getElementById('view-budget-summary')?.classList.contains('active')) {
       await loadSummary(sb, els.summaryMonth.value || selectedHomeYM());

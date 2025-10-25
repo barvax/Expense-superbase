@@ -280,3 +280,11 @@ html { -webkit-text-size-adjust: 100%; }
 .view.active { display:block; }
 /* ניהול תצוגת מסכים */
 
+.sum-sep {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+.cat-item.total .cat-name {
+  font-weight: 700;
+}
