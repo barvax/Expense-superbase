@@ -41,25 +41,25 @@ function setInputYM(ym) {
 }
 
 // במקרה של שני <select>
-function fillMonthYearDefaultsIfNeeded() {
-  const mSel = els.monthSelect, ySel = els.yearSelect;
-  if (!mSel || !ySel) return; // לא בשימוש כרגע
+// function fillMonthYearDefaultsIfNeeded() {
+//   const mSel = els.monthSelect, ySel = els.yearSelect;
+//   if (!mSel || !ySel) return; // לא בשימוש כרגע
 
-  // חודשים 01..12
-  const monthVals = ['01','02','03','04','05','06','07','08','09','10','11','12'];
-  mSel.innerHTML = monthVals.map((m,i)=>`<option value="${String(i+1).padStart(2,'0')}">${m}</option>`).join('');
+//   // חודשים 01..12
+//   const monthVals = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+//   mSel.innerHTML = monthVals.map((m,i)=>`<option value="${String(i+1).padStart(2,'0')}">${m}</option>`).join('');
 
-  // שנים: השנה-4 עד השנה+1
-  const y = new Date().getFullYear();
-  const years = [];
-  for (let yy = y - 4; yy <= y + 1; yy++) years.push(yy);
-  ySel.innerHTML = years.map(yy=>`<option value="${yy}">${yy}</option>`).join('');
+//   // שנים: השנה-4 עד השנה+1
+//   const y = new Date().getFullYear();
+//   const years = [];
+//   for (let yy = y - 4; yy <= y + 1; yy++) years.push(yy);
+//   ySel.innerHTML = years.map(yy=>`<option value="${yy}">${yy}</option>`).join('');
 
-  // ברירת מחדל = חודש נוכחי
-  const now = new Date();
-  mSel.value = String(now.getMonth()+1).padStart(2,'0');
-  ySel.value = String(now.getFullYear());
-}
+//   // ברירת מחדל = חודש נוכחי
+//   const now = new Date();
+//   mSel.value = String(now.getMonth()+1).padStart(2,'0');
+//   ySel.value = String(now.getFullYear());
+// }
 
 function getSelectYM() {
   const mSel = els.monthSelect, ySel = els.yearSelect;
@@ -131,7 +131,7 @@ async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
 
   // תרחיש B (אופציונלי): אם בעתיד תחליף לבורר selectים
   if (els.monthSelect && els.yearSelect) {
-    fillMonthYearDefaultsIfNeeded();
+  //  fillMonthYearDefaultsIfNeeded();
 
     // טעינה ראשונית
     const ymSel = getSelectYM();
@@ -156,4 +156,39 @@ async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
 
     await loadMonthlySummary(sb, ym);
   });
+})();
+// --- Month/Year selects: אתחול ברירת מחדל לחודש הנוכחי ושנים עד 2030 ---
+(function initMonthYear() {
+  const monthSel = document.getElementById('monthSelect');
+  const yearSel  = document.getElementById('yearSelect');
+  if (!monthSel || !yearSel) return;
+
+  // חודשים 01..12
+  monthSel.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = String(m).padStart(2,'0');
+    opt.textContent = String(m).padStart(2,'0');
+    monthSel.appendChild(opt);
+  }
+
+  // שנים: לדוגמה 2020..2030 (בחר מה שמתאים לך; כאן עד 2030)
+  const thisYear = new Date().getFullYear();
+  const startYear = Math.min(thisYear, 2020);
+  const endYear   = 2030;
+  yearSel.innerHTML = '';
+  for (let y = startYear; y <= endYear; y++) {
+    const opt = document.createElement('option');
+    opt.value = String(y);
+    opt.textContent = String(y);
+    yearSel.appendChild(opt);
+  }
+
+  // ברירת מחדל: היום
+  const now = new Date();
+  monthSel.value = String(now.getMonth()+1).padStart(2,'0');
+  yearSel.value  = String(now.getFullYear());
+
+  // אם יש לך פונקציה שטוענת KPI לפי חודש, קרא לה כאן כדי להציג מיד
+  // loadKpisForSelectedMonth();  // דוגמה: אם קיימת אצלך
 })();

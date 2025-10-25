@@ -169,10 +169,13 @@
         <!-- מצב הוצאה -->
         <div id="expenseModeBlock" class="field">
           <label>סוג הוצאה</label>
-          <div class="seg">
-            <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
-            <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
-          </div>
+        <!-- בקובץ index.html כבר יש: -->
+<div class="seg">
+  <button type="button" data-mode="one_time" class="seg__btn seg__btn--active">חד-פעמית</button>
+  <button type="button" data-mode="installments" class="seg__btn">תשלומים</button>
+  <button type="button" data-mode="recurring" class="seg__btn">הוצאה קבועה</button>
+</div>
+
         </div>
 
         <div id="installmentsBlock" class="field hidden">
