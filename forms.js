@@ -43,7 +43,7 @@ const els = {
   txMonths:      document.getElementById('txMonths'),
 };
 
-const ILS = new Intl.NumberFormat('he-IL', { style:'currency', currency:'ILS', maximumFractionDigits:0 });
+const ILS  = new Intl.NumberFormat('he-IL', { style:'currency', currency:'ILS', maximumFractionDigits:0 });
 const cents = (n) => Math.max(0, Math.round((Number(n)||0) * 100));
 
 /* ---------- לוגיקה פנימית ---------- */
@@ -112,7 +112,10 @@ function renderCategories(list) {
     els.tabIncome.classList.remove('active');
     setKind('expense');
     // טען קטגוריות הוצאה
-    const { data, error } = await sb.from('categories').select('id,name,icon').eq('kind','expense').order('name');
+    const { data, error } = await sb.from('categories')
+      .select('id,name,icon')
+      .eq('kind','expense')
+      .order('name');
     if (!error) renderCategories(data || []);
   });
 
@@ -127,7 +130,10 @@ function renderCategories(list) {
   els.addExpenseBtn?.addEventListener('click', async () => {
     clearForm('expense');
     // טען קטגוריות הוצאה
-    const { data, error } = await sb.from('categories').select('id,name,icon').eq('kind','expense').order('name');
+    const { data, error } = await sb.from('categories')
+      .select('id,name,icon')
+      .eq('kind','expense')
+      .order('name');
     if (!error) renderCategories(data || []);
     showAddDialog(true);
   });
@@ -160,17 +166,25 @@ function renderCategories(list) {
   els.form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     els.txErr.textContent = '';
+
     try {
-      const kind = els.txKind.value; // 'expense' | 'income'
+      // קבל user_id לסיפוק RLS
+      const { data:{ session } } = await sb.auth.getSession();
+      if (!session?.user) throw new Error('לא מחובר');
+      const user_id = session.user.id;
+
+      const kind   = els.txKind.value; // 'expense' | 'income'
       const amount = Number(els.txAmount.value || 0);
-      const dateStr = els.txDate.value;
-      const note = els.txNote.value || '';
+      const dateStr= els.txDate.value;
+      const note   = els.txNote.value || '';
 
       if (!dateStr) throw new Error('נא לבחור תאריך');
       if (amount <= 0) throw new Error('סכום חייב להיות גדול מאפס');
 
       if (kind === 'income') {
+        // הכנסה רגילה — חייב לכלול user_id כדי לעבור RLS
         const { error } = await sb.from('transactions').insert({
+          user_id,
           kind: 'income',
           amount_cents: Math.round(amount * 100),
           occurred_at: dateStr,
@@ -186,7 +200,9 @@ function renderCategories(list) {
         const amountCents = Math.round(amount * 100);
 
         if (expenseMode === 'one_time') {
+          // הוצאה חד-פעמית — גם כאן נשלח user_id
           const { error } = await sb.from('transactions').insert({
+            user_id,
             kind: 'expense',
             category_id: catId,
             amount_cents: amountCents,
@@ -197,6 +213,7 @@ function renderCategories(list) {
           if (error) throw error;
 
         } else if (expenseMode === 'installments') {
+          // תשלומים: השימוש ב-RPC ממלא user_id בצד השרת (auth.uid())
           const months = Math.max(1, parseInt(els.txMonths.value || '1', 10));
           const { error } = await sb.rpc('add_installments', {
             p_category_id: catId,
@@ -208,12 +225,12 @@ function renderCategories(list) {
           if (error) throw error;
 
         } else if (expenseMode === 'recurring') {
-          // ברירת מחדל 36 חודשים (3 שנים קדימה)
+          // הוצאה קבועה: גם כאן RPC בצד השרת מטפל ב-user_id
           const { error } = await sb.rpc('add_recurring_expense', {
             p_category_id: catId,
             p_amount_cents: amountCents,
             p_start_date: dateStr,
-            p_months: 36,
+            p_months: 36, // 3 שנים קדימה
             p_note: note
           });
           if (error) throw error;
