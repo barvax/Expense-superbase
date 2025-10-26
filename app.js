@@ -11,17 +11,13 @@ function waitForSb() {
 
 // --- DOM ---
 const els = {
-  // בורר חודש — תומך בשתי גישות:
-  monthInput:  document.getElementById('month'),        // <input type="month"> (קיים אצלך כיום)
-  monthSelect: document.getElementById('monthSelect'),   // <select> (אופציונלי)
-  yearSelect:  document.getElementById('yearSelect'),    // <select> (אופציונלי)
-
-  kpiIncome: document.getElementById('kpiIncome'),
-  kpiExpense: document.getElementById('kpiExpense'),
-  kpiDelta:   document.getElementById('kpiDelta'),
+  monthInput:  document.getElementById('month'),
+  monthSelect: document.getElementById('monthSelect'),
+  yearSelect:  document.getElementById('yearSelect'),
   hint:       document.getElementById('hint'),
   err:        document.getElementById('err'),
 };
+
 
 const ILS = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 });
 const fmt = (cents) => ILS.format(Math.round((cents || 0) / 100));
@@ -72,11 +68,10 @@ function getSelectYM() {
 async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
   try {
     if (!ym) return;
-    els.err.textContent  = '';
-    els.hint.textContent = 'טוען נתונים...';
-    els.kpiIncome.textContent = '₪0';
-    els.kpiExpense.textContent = '₪0';
-    els.kpiDelta.textContent   = '₪0';
+  els.err.textContent  = '';
+els.hint.textContent = 'טוען נתונים...';
+setRing(0, 0); // מאפס את הדונאט בזמן טעינה
+
 
     const [y,m] = ym.split('-');
     const monthDate = `${y}-${m}-01`;
@@ -91,14 +86,21 @@ async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
 
     if (!data || !data.length) {
       els.hint.textContent = 'אין נתונים לחודש זה.';
+      setRing(0, 0); // גם כאן לאפס את הדונאט
       return;
     }
 
-    const row = data[0];
-    els.kpiIncome.textContent = fmt(row.income_cents);
-    els.kpiExpense.textContent = fmt(row.expense_cents);
-    els.kpiDelta.textContent   = fmt(row.delta_cents);
-    els.hint.textContent = '';
+   
+const row = data[0];
+const income = row.income_cents || 0;
+const expense = row.expense_cents || 0;
+
+// מציג בדונאט ובכותרת
+setRing(income, expense);
+
+// נקה הודעת “טוען…”
+els.hint.textContent = '';
+
   } catch (e) {
     console.error(e);
     els.err.textContent = 'שגיאה: ' + (e?.message || e);
@@ -192,3 +194,50 @@ async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
   // אם יש לך פונקציה שטוענת KPI לפי חודש, קרא לה כאן כדי להציג מיד
   // loadKpisForSelectedMonth();  // דוגמה: אם קיימת אצלך
 })();
+// הזרועות בדונאט
+function setRing(incomeCents, expenseCents) {
+  const income  = Math.max(0, Number(incomeCents)  || 0);
+  const expense = Math.max(0, Number(expenseCents) || 0);
+  const remain  = Math.max(0, income - expense);
+
+  // טקסטים במרכז
+  const remainEl = document.getElementById('ringRemain');
+  const daysEl   = document.getElementById('ringDays');
+  if (remainEl) remainEl.textContent = ILS.format(Math.round(remain / 100));
+
+  // ציור באחוזים (pathLength=100)
+  const incCirc = document.getElementById('ring-income-circ');
+  const expCirc = document.getElementById('ring-expense-circ');
+
+  if (incCirc) {
+    incCirc.setAttribute('stroke-dasharray', '100 100');
+    incCirc.setAttribute('stroke-dashoffset', '0');
+  }
+
+  let pct = 0;                      // % מההכנסה
+  if (income > 0) pct = Math.min(100, (expense / income) * 100);
+  else if (expense > 0) pct = 100;  // אין הכנסות – כל ההוצאה = 100%
+
+  if (expCirc) {
+    expCirc.setAttribute('stroke-dasharray', `${pct} ${100 - pct}`);
+    expCirc.setAttribute('stroke-dashoffset', '0');
+  }
+
+  // אופציונלי: ימים שנותרו אם החודש הנוכחי
+  try {
+    const ymSel =
+      (document.getElementById('month')?.value) ||
+      (document.getElementById('yearSelect')?.value && document.getElementById('monthSelect')?.value
+        ? `${document.getElementById('yearSelect').value}-${document.getElementById('monthSelect').value}` : null);
+    if (ymSel && daysEl) {
+      const [y, m] = ymSel.split('-').map(Number);
+      const now = new Date();
+      if (now.getFullYear() === y && now.getMonth() + 1 === m) {
+        const daysInMonth = new Date(y, m, 0).getDate();
+        daysEl.textContent = `${Math.max(0, daysInMonth - now.getDate())} days left`;
+      } else {
+        daysEl.textContent = '';
+      }
+    }
+  } catch {}
+}

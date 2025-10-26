@@ -40,6 +40,9 @@
           <h1 class="title">תקציב משפחתי — סיכום חודשי</h1>
           <div class="spacer"></div>
           <button id="logoutBtn" class="btn">יציאה</button>
+          <!-- בתוך <div class="bar"> של ההדר, ליד יציאה -->
+<button id="themeToggle" class="btn theme-toggle" title="מצב כהה/בהיר">🌓</button>
+
         </div>
 
         <div class="bar sub">
@@ -53,20 +56,57 @@
       </header>
 
       <main>
-        <section class="grid">
-          <div class="kpi">
-            <h3>הכנסות</h3>
-            <div id="kpiIncome" class="val ok">₪0</div>
-          </div>
-          <div class="kpi">
-            <h3>הוצאות</h3>
-            <div id="kpiExpense" class="val bad">₪0</div>
-          </div>
-          <div class="kpi">
-            <h3>דלתא</h3>
-            <div id="kpiDelta" class="val">₪0</div>
-          </div>
-        </section>
+        <!-- כרטיס סיכום חודשי בעיגול -->
+<section class="card ring-card">
+  <div class="ring-head">
+    <div class="ring-side">
+      <div class="muted">Income</div>
+      <div id="ringIncome" class="ring-fig ok">₪0</div>
+    </div>
+
+    <h2 id="ringMonthTitle" class="ring-title">October 2025</h2>
+
+    <div class="ring-side">
+      <div class="muted">Expense</div>
+      <div id="ringExpense" class="ring-fig bad">₪0</div>
+    </div>
+  </div>
+
+<div class="ring-wrap">
+  <svg viewBox="0 0 120 120" class="ring" width="100%" height="100%">
+    <!-- טבעת אפורה רקע -->
+    <circle cx="60" cy="60" r="50" fill="none"
+            stroke="var(--ring-bg, #e5e7eb)" stroke-width="12" />
+
+    <!-- מסובבים כדי להתחיל מלמעלה -->
+    <g transform="rotate(-90 60 60)">
+      <!-- טבעת הכנסה (ירוק) – מלאה 100% כ"רקע" -->
+      <circle id="ring-income-circ" pathLength="100"
+              cx="60" cy="60" r="50" fill="none"
+              stroke="var(--ring-green, #22c55e)" stroke-width="12"
+              stroke-linecap="round"
+              stroke-dasharray="100 100" stroke-dashoffset="0" />
+
+      <!-- טבעת הוצאה (אדום) – נצבעה לפי אחוז מההכנסה -->
+      <circle id="ring-expense-circ" pathLength="100"
+              cx="60" cy="60" r="50" fill="none"
+              stroke="var(--ring-red, #ef4444)" stroke-width="12"
+              stroke-linecap="round"
+              stroke-dasharray="0 100" stroke-dashoffset="0" />
+    </g>
+  </svg>
+
+  <div class="ring-center">
+    <div id="ringRemain" class="ring-main">₪0</div>
+    <div class="muted">נשאר להוציא</div>
+    <div id="ringDays" class="muted small"></div>
+  </div>
+</div>
+
+
+  <button id="openDetailsBtn" class="btn ring-cta">כל ההכנסות וההוצאות לחודש</button>
+</section>
+
 
         <div class="bar" style="padding:0 16px">
           <button id="addIncomeBtn" class="btn primary">+ הכנסה</button>

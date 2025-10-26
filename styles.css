@@ -288,3 +288,169 @@ html { -webkit-text-size-adjust: 100%; }
 .cat-item.total .cat-name {
   font-weight: 700;
 }
+/* ===== Theme variables (Light) ===== */
+:root {
+  --bg: #fafafa;
+  --card: #ffffff;
+  --text: #111111;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #0ea5e9;
+  --accent-weak: rgba(14,165,233,.12);
+}
+
+/* ===== Theme variables (Dark) ===== */
+html[data-theme="dark"] {
+  --bg: #0b1016;
+  --card: #0f172a;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --border: #1f2937;
+  --accent: #38bdf8;
+  --accent-weak: rgba(56,189,248,.15);
+}
+
+/* Apply variables */
+body { background: var(--bg); color: var(--text); }
+.card { background: var(--card); border: 1px solid var(--border); }
+.muted { color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color:#fff; }
+
+/* ===== Modal fixes for mobile ===== */
+.modal__card {
+  max-height: 85vh;
+  overflow: auto;
+}
+.picker { /* רשת הקטגוריות */
+  max-height: 38vh;            /* נמוך יותר לנייד */
+  overflow: auto;
+}
+
+/* ===== קטגוריות — קומפקטי בנייד + היילייט ===== */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* ברירת מחדל */
+  gap: 8px;
+}
+
+/* גודל קומפקטי ברירת מחדל */
+.cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  cursor: pointer;
+  user-select: none;
+}
+.cat .emoji { font-size: 20px; line-height: 1; }
+.cat .name  { font-size: 12px; color: var(--text); }
+
+/* היילייט לבחירה */
+.cat.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-weak);
+  background: linear-gradient(to bottom, var(--accent-weak), transparent);
+}
+
+/* ===== התאמות מובייל חזקות ===== */
+@media (max-width: 430px) {
+  .cat-grid {
+    grid-template-columns: repeat(4, 1fr); /* יותר עמודות → חצי גודל */
+    gap: 6px;
+  }
+  .cat {
+    padding: 6px 4px;
+    border-radius: 10px;
+  }
+  .cat .emoji { font-size: 18px; }
+  .cat .name  { font-size: 11px; }
+}
+
+/* ===== Toggle Dark/Light button base ===== */
+.theme-toggle {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+/* ===== Ring KPI card ===== */
+.ring-card { padding: 16px; border-radius: 18px; }
+.ring-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ring-title { margin: 0; font-size: 22px; text-align: center; }
+.ring-side { text-align: center; }
+.ring-fig { font-weight: 700; font-size: 18px; }
+.ok { color: #16a34a; }   /* ירוק */
+.bad { color: #ef4444; }  /* אדום */
+
+.ring-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: 10px auto 14px;
+  aspect-ratio: 1 / 1;
+}
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg); /* שהתחלה תהיה בשעה 12 */
+}
+.ring-base {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 12;
+}
+.ring-income {
+  fill: none;
+  stroke: #16a34a; /* ירוק */
+  stroke-width: 12;
+  stroke-dasharray: 0 999; /* נגדיר בדינאמיקה */
+  stroke-linecap: round;
+  opacity: 0.25; /* ירוק חלש כרקע 100% הכנסה */
+}
+.ring-expense {
+  fill: none;
+  stroke: #ef4444; /* אדום */
+  stroke-width: 12;
+  stroke-dasharray: 0 999; /* נגדיר בדינאמיקה */
+  stroke-linecap: round;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 16px;
+}
+.ring-amount { font-size: 22px; font-weight: 800; }
+.ring-sub    { margin-top: 4px; }
+.ring-days   { margin-top: 2px; }
+
+/* כפתור בתחתית הכרטיס */
+.ring-cta {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* מובייל כיוונונים */
+@media (max-width: 430px) {
+  .ring-title { font-size: 20px; }
+  .ring-amount { font-size: 20px; }
+}
+.ring-income { opacity: .35; } /* במקום .25 אם רוצה שיראו יותר את הרקע הירוק */
+.ring-wrap { position: relative; max-width: 360px; margin: 0 auto; }
+.ring { display: block; }
+.ring-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; }
+.ring-main { font-size: 28px; font-weight: 700; }
