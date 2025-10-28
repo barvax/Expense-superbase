@@ -65,47 +65,62 @@ function getSelectYM() {
 }
 
 // --- קריאת נתונים ---
-async function loadMonthlySummary(sb, ym /* 'YYYY-MM' */) {
+async function loadMonthlySummary(sb, ym) {
   try {
-    if (!ym) return;
-  els.err.textContent  = '';
-els.hint.textContent = 'טוען נתונים...';
-setRing(0, 0); // מאפס את הדונאט בזמן טעינה
+    const [y, m] = ym.split('-');
+    // תאריך מדויק ליום הראשון בחודש בפורמט תקני
+    const monthDate = new Date(`${y}-${m}-01T00:00:00Z`).toISOString().split('T')[0];
 
+    console.log('Loading summary for', monthDate);
 
-    const [y,m] = ym.split('-');
-    const monthDate = `${y}-${m}-01`;
-
+    // שליפת נתוני סיכום חודשי
     const { data, error } = await sb
       .from('v_monthly_summary')
       .select('*')
       .eq('month', monthDate)
       .limit(1);
 
-    if (error) throw error;
-
-    if (!data || !data.length) {
-      els.hint.textContent = 'אין נתונים לחודש זה.';
-      setRing(0, 0); // גם כאן לאפס את הדונאט
+    if (error) {
+      console.error('Error loading summary:', error);
       return;
     }
 
-   
-const row = data[0];
-const income = row.income_cents || 0;
-const expense = row.expense_cents || 0;
+    // איתור אלמנטים במסך
+    const incomeEl = document.getElementById('ringIncome');
+    const expenseEl = document.getElementById('ringExpense');
+    const deltaEl = document.getElementById('deltaVal');
 
-// מציג בדונאט ובכותרת
-setRing(income, expense);
+    if (data && data.length > 0) {
+      const row = data[0];
+      const income = row.income_cents / 100;
+      const expense = row.expense_cents / 100;
+      const delta = row.delta_cents / 100;
 
-// נקה הודעת “טוען…”
-els.hint.textContent = '';
+      // עדכון הערכים בתצוגה
+   if (incomeEl)
+  incomeEl.textContent = income.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+if (expenseEl)
+  expenseEl.textContent = expense.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+if (deltaEl)
+  deltaEl.textContent = delta.toLocaleString('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
+      // עדכון טבעת הגרף
+      updateDonut(income, expense);
+    } else {
+      console.warn('No summary data found for', monthDate);
+
+      // איפוס הערכים אם אין נתונים
+      if (incomeEl) incomeEl.textContent = '₪0';
+      if (expenseEl) expenseEl.textContent = '₪0';
+      if (deltaEl) deltaEl.textContent = '₪0';
+
+      updateDonut(0, 0);
+    }
   } catch (e) {
-    console.error(e);
-    els.err.textContent = 'שגיאה: ' + (e?.message || e);
+    console.error('Exception in loadMonthlySummary:', e);
   }
 }
+
 
 // --- אתחול כללי ---
 (async () => {
@@ -140,12 +155,18 @@ els.hint.textContent = '';
     await loadMonthlySummary(sb, ymSel);
 
     // מאזינים
-    els.monthSelect.addEventListener('change', async () => {
-      await loadMonthlySummary(sb, getSelectYM());
-    });
-    els.yearSelect.addEventListener('change', async () => {
-      await loadMonthlySummary(sb, getSelectYM());
-    });
+  els.monthSelect.addEventListener('change', async () => {
+  updateMonthTitle(); // עדכן את הכותרת
+  await loadMonthlySummary(sb, getSelectYM());
+});
+
+els.yearSelect.addEventListener('change', async () => {
+  updateMonthTitle(); // עדכן את הכותרת
+  await loadMonthlySummary(sb, getSelectYM());
+  updateMonthTitle();
+
+});
+
   }
 
   // רענון KPI אחרי הוספה (forms.js יורה את האירוע הזה)
@@ -165,14 +186,25 @@ els.hint.textContent = '';
   const yearSel  = document.getElementById('yearSelect');
   if (!monthSel || !yearSel) return;
 
-  // חודשים 01..12
-  monthSel.innerHTML = '';
-  for (let m = 1; m <= 12; m++) {
-    const opt = document.createElement('option');
-    opt.value = String(m).padStart(2,'0');
-    opt.textContent = String(m).padStart(2,'0');
-    monthSel.appendChild(opt);
-  }
+// חודשים באנגלית (January..December)
+const monthNames = [
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December"
+];
+
+monthSel.innerHTML = '';
+for (let m = 1; m <= 12; m++) {
+  const opt = document.createElement('option');
+  opt.value = String(m).padStart(2, '0'); // עדיין ערך מספרי
+  opt.textContent = monthNames[m - 1];   // שם חודש באנגלית
+  monthSel.appendChild(opt);
+}
+
+// ברירת מחדל – החודש הנוכחי מסומן
+const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+monthSel.value = currentMonth;
+
 
   // שנים: לדוגמה 2020..2030 (בחר מה שמתאים לך; כאן עד 2030)
   const thisYear = new Date().getFullYear();
@@ -194,6 +226,25 @@ els.hint.textContent = '';
   // אם יש לך פונקציה שטוענת KPI לפי חודש, קרא לה כאן כדי להציג מיד
   // loadKpisForSelectedMonth();  // דוגמה: אם קיימת אצלך
 })();
+
+// --- עדכון כותרת חודש ושנה ---
+function updateMonthTitle() {
+  const monthSel = document.getElementById('monthSelect');
+  const yearSel  = document.getElementById('yearSelect');
+  const titleEl  = document.getElementById('ringMonthTitle');
+  if (!monthSel || !yearSel || !titleEl) return;
+
+  const monthNames = [
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December"
+  ];
+
+  const monthNum = parseInt(monthSel.value, 10);
+  const monthName = monthNames[monthNum - 1];
+  titleEl.textContent = `${monthName} ${yearSel.value}`;
+}
+
 // הזרועות בדונאט
 function setRing(incomeCents, expenseCents) {
   const income  = Math.max(0, Number(incomeCents)  || 0);
@@ -240,4 +291,27 @@ function setRing(incomeCents, expenseCents) {
       }
     }
   } catch {}
+}
+// --- פונקציה לעדכון טבעת ההכנסות/הוצאות ---
+function updateDonut(income, expense) {
+  const ringIncome = document.getElementById('ring-income-circ');
+  const ringExpense = document.getElementById('ring-expense-circ');
+
+  if (!ringIncome || !ringExpense) return;
+
+  // חישוב אחוז ההוצאה מתוך ההכנסה
+  const total = Math.max(income, 1); // להימנע מחלוקה באפס
+  const percent = Math.min(100, (expense / total) * 100);
+
+  // צבעים פסטליים עדינים 💜💙
+  ringIncome.style.stroke = '#A8C5FF'; // כחול-פסטלי להכנסה
+  ringExpense.style.stroke = '#C8A8FF'; // סגול-ורדרד להוצאה
+
+  // רקע מלא
+  ringIncome.setAttribute('stroke-dasharray', '100 100');
+  ringIncome.setAttribute('stroke-dashoffset', '0');
+
+  // הוצאה – בהתאם לאחוז
+  ringExpense.setAttribute('stroke-dasharray', `${percent} 100`);
+  ringExpense.setAttribute('stroke-dashoffset', '0');
 }

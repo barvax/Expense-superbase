@@ -389,8 +389,8 @@ body { background: var(--bg); color: var(--text); }
 .ring-title { margin: 0; font-size: 22px; text-align: center; }
 .ring-side { text-align: center; }
 .ring-fig { font-weight: 700; font-size: 18px; }
-.ok { color: #16a34a; }   /* ירוק */
-.bad { color: #ef4444; }  /* אדום */
+.ok { color: #86aae8; }   /* ירוק */
+.bad { color: #d6a1a1; }  /* אדום */
 
 .ring-wrap {
   position: relative;
@@ -412,7 +412,7 @@ body { background: var(--bg); color: var(--text); }
 }
 .ring-income {
   fill: none;
-  stroke: #16a34a; /* ירוק */
+  stroke: #86aae8; /* ירוק */
   stroke-width: 12;
   stroke-dasharray: 0 999; /* נגדיר בדינאמיקה */
   stroke-linecap: round;
@@ -420,7 +420,7 @@ body { background: var(--bg); color: var(--text); }
 }
 .ring-expense {
   fill: none;
-  stroke: #ef4444; /* אדום */
+  stroke: #d6a1a1; /* אדום */
   stroke-width: 12;
   stroke-dasharray: 0 999; /* נגדיר בדינאמיקה */
   stroke-linecap: round;
@@ -454,3 +454,1019 @@ body { background: var(--bg); color: var(--text); }
 .ring { display: block; }
 .ring-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; }
 .ring-main { font-size: 28px; font-weight: 700; }
+/* ========== Login – Modern soft look ========== */
+#view-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100svh;
+  background: linear-gradient(180deg, #f5f7fb, #e9ecf2);
+  padding: 24px;
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.login-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 14px;
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+.login-form label {
+  display: block;
+  text-align: right;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 10px 4px 4px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: #111827;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: #60a5fa;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+/* ===== כפתור התחברות בעיצוב עדין כמו בתמונה ===== */
+/* From Uiverse.io by zanina-yassine */ 
+#loginBtn{
+  min-width: 120px;
+margin-top: 20px;
+  position: relative;
+  cursor: pointer;
+
+  padding: 12px 17px;
+  border: 0;
+  border-radius: 7px;
+
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: radial-gradient(
+    ellipse at bottom,
+    rgba(71, 81, 92, 1) 0%,
+    rgba(11, 21, 30, 1) 45%
+  );
+
+  color: rgb(255, 255, 255, 0.66);
+
+  transition: all 1s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+
+#loginBtn::before {
+  content: "";
+  width: 70%;
+  height: 1px;
+
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0.2;
+
+  transition: all 1s cubic-bezier(0.15, 0.83, 0.66, 1);
+}
+#loginBtn:hover {
+  color: rgb(255, 255, 255, 1);
+  transform: scale(1.1) translateY(-3px);
+}
+
+#loginBtn:hover::before {
+  opacity: 1;
+}
+
+
+
+.msg.err {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Mobile spacing */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 26px 20px;
+    border-radius: 18px;
+  }
+}
+/* תיקון: ודא שכשלא active – המסך מוסתר גם אם יש לו display משל עצמו */
+.view:not(.active) {
+  display: none !important;
+}
+/* ===== כרטיס טבעת סיכום חודשי בעיצוב פסטלי ===== */
+.ring-card {
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  padding: 22px 16px 26px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ring-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* הכותרת העליונה */
+.ring-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.ring-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* צבעים חדשים לפסטל */
+:root {
+  --ring-bg: #f3f4f6;
+  --ring-green: #b7e4c7; /* ירוק מנטה */
+  --ring-red: #f8b4b4;   /* אדום ורדרד */
+}
+
+/* שינוי גודל העיגול */
+.ring-wrap {
+  position: relative;
+  width: 240px;   /* היה גדול מדי – הקטן */
+  height: 240px;
+  margin: 0 auto 16px;
+}
+
+.ring {
+  width: 100%;
+  height: 100%;
+}
+
+/* המרכז */
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+}
+
+.ring-main {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.ring-center .muted {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* הכפתור למטה */
+.ring-cta {
+  background: #f5f7fb;
+  color: #111827;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+}
+
+.ring-cta:hover {
+  background: #e7ecf9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+:root {
+  --ring-green: #68c3f8 !important; /* ירוק מנטה פסטלי */
+  --ring-red: #b35df6 !important;   /* ורדרד פסטלי */
+}
+/* ===== עיצוב חדש לכפתורי הפעולות בתחתית ===== */
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0 10px;
+  align-items: center;
+}
+
+.action-buttons .row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+  background: #f8f9fc;
+  border: 1px solid #e2e5ec;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.action-buttons .btn.primary {
+  background: #e5f1ff;
+  border-color: #d1e6ff;
+  color: #1d4ed8;
+}
+
+.action-buttons .btn:hover {
+  background: #eef2ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.action-buttons .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+/* ===== עיצוב חדש ל־Header ===== */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* אזור בחירת חודש */
+.month-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-section label {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.month-picker select {
+  appearance: none;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.month-picker select:hover {
+  background: #f3f4f6;
+  border-color: #cbd5e1;
+}
+
+/* כפתור יציאה */
+.logout-btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 14px;
+  color: #374151;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+/* עיצוב עדין לערכי ההכנסה וההוצאה */
+.ring-fig {
+  font-size: 0.95rem;   /* הקטנה קלה */
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ring-side .ok {
+  color: #8cbaff; /* כחול פסטלי להכנסה */
+}
+
+.ring-side .bad {
+  color: #d7a6ff; /* סגול פסטלי להוצאה */
+}
+.ring-fig {
+  font-size: 0.85rem;
+}
+/* <!-----> */
+
+/* ===== עיצוב חדש למסך הפירוט (Details Modal) ===== */
+#detailsDialog .modal__card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+  padding: 20px 18px 24px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#detailsTitle {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+/* Tabs */
+#detailsDialog .tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  border: none;
+}
+
+#detailsDialog .tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  transition: all 0.25s ease;
+}
+
+#detailsDialog .tab.active {
+  background: #e5f1ff;
+  color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* רשימת תנועות */
+.tx-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tx-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease;
+}
+
+.tx-row:hover {
+  transform: translateY(-2px);
+}
+
+.tx-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.tx-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.tx-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #111827;
+  font-size: 14px;
+}
+
+.tx-note {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.tx-meta {
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.tx-amt.ok {
+  color: #60a5fa; /* כחול פסטלי להכנסה */
+  font-weight: 700;
+}
+
+.tx-amt.bad {
+  color: #ec4899; /* ורוד-פסטלי להוצאה */
+  font-weight: 700;
+}
+
+/* כפתור מחיקה */
+.tx-del {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tx-del:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+/* סיכומי תחתית */
+#detailsDialog .sums {
+  display: flex;
+  justify-content: space-between;
+  background: #f9fafb;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* כפתור סגירה */
+#closeDetailsBtn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #111827;
+  transition: all 0.25s ease;
+}
+
+#closeDetailsBtn:hover {
+  background: #e5e7eb;
+}
+/* === Header עדין ומרוכז === */
+.details-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.details-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e1e1e;
+  margin: 0;
+}
+
+/* כפתור סגירה קטן ועדין */
+.close-btn {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #111827;
+}
+
+/* הקטנת פונט כללית בתוך המסך */
+#detailsDialog .modal__card {
+  font-size: 0.9rem;
+  padding: 16px;
+}
+
+/* טאבים קטנים ורכים יותר */
+#detailsDialog .tab {
+  font-size: 0.8rem;
+  padding: 6px 0;
+  border-radius: 8px;
+}
+
+/* כרטיסי סיכום ממורכזים */
+.summary-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  text-align: center;
+}
+
+.summary-card {
+  min-width: 100px;
+  padding: 8px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+}
+
+/* כרטיסי תנועות קטנים יותר */
+.tx-row {
+  font-size: 0.85rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+.tx-amt.bad {
+  color: #ec4899;
+  font-size: 0.9rem;
+}
+.tx-amt.ok {
+  color: #60a5fa;
+  font-size: 0.9rem;
+}
+/* === פירוט חודשי מעודן ומרכזי === */
+
+#detailsDialog .modal__card {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 18px;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* --- Header --- */
+.details-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.details-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.close-btn {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #111827;
+}
+
+/* --- Tabs --- */
+#detailsDialog .tabs {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+#detailsDialog .tab {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+#detailsDialog .tab.active {
+  background: #e0ecff;
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* --- KPI (סה"כ) --- */
+.grid {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kpi {
+  flex: 1;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.kpi h3 {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.kpi .val {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.kpi .val.ok {
+  color: #60a5fa;
+}
+
+.kpi .val.bad {
+  color: #ec4899;
+}
+
+/* --- Transactions list --- */
+.tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+
+.tx-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.tx-row:hover {
+  transform: translateY(-2px);
+}
+
+.tx-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: right;
+}
+
+.tx-cat {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #111827;
+}
+
+.tx-note {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.tx-date {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.tx-amt {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.tx-amt.bad {
+  color: #ec4899;
+}
+
+.tx-amt.ok {
+  color: #60a5fa;
+}
+
+/* --- Hint / Footer --- */
+#detailsHint {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 10px;
+  text-align: center;
+}
+/* === Header: centered title + small close button === */
+.details-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-top: 4px;
+}
+
+.details-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* כפתור סגירה קטן ועדין בפינה שמאלית למעלה */
+.close-btn {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #9ca3af;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #111827;
+  transform: scale(1.1);
+}
+
+/* כדי לוודא שהכותרת נשארת ממורכזת גם עם כפתור בצד */
+.details-header::before,
+.details-header::after {
+  content: '';
+  flex: 1;
+}
+/* === עיצוב מסך הוספת הוצאה/הכנסה === */
+
+/* רקע כללי של המודאל */
+.modal__card.add-form {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 18px;
+  max-width: 430px;
+  margin: 0 auto;
+  color: #1f2937;
+}
+
+/* כפתור סגירה קטן ועדין */
+.add-form .close-btn {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.add-form .close-btn:hover {
+  color: #111827;
+  transform: scale(1.1);
+}
+
+/* כותרת */
+.add-form h2 {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 8px;
+}
+
+/* טאבים */
+.add-form .tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.add-form .tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border: none;
+  border-radius: 10px;
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #6b7280;
+  transition: all 0.25s ease;
+}
+
+.add-form .tab.active {
+  background: #e0ecff;
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+}
+
+/* כרטיסיות קטגוריות */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.category-item:hover {
+  background: #f0f9ff;
+  transform: translateY(-2px);
+}
+
+.category-item.selected {
+  background: #e0ecff;
+  border-color: #93c5fd;
+}
+
+/* === טפסים === */
+.add-form input,
+.add-form textarea,
+.add-form select {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #111827;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+.add-form input:focus,
+.add-form textarea:focus,
+.add-form select:focus {
+  border-color: #60a5fa;
+  background: #ffffff;
+  outline: none;
+}
+
+/* === כפתורי סוג הוצאה === */
+.expense-type-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.expense-type-buttons button {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 10px;
+  padding: 8px;
+  margin: 0 4px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.expense-type-buttons button.active {
+  background: #e0ecff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+/* טקסטים קטנים */
+.add-form label,
+.add-form .muted {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+/* שדה תאריך */
+.add-form input[type="date"] {
+  color-scheme: light;
+}
+
+/* ביטול הרקע השחור שהיה קודם */
+input,
+textarea,
+select {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+/* === גלילה ותצוגת modal כללית === */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  overflow-y: auto; /* מאפשר גלילה על כל המסך */
+  padding: 20px 0;
+}
+
+/* === הכרטיס הפנימי של מסך הוספה === */
+.modal__card.add-form {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  width: 92%;
+  max-width: 440px;
+  margin: auto;
+  padding: 18px 20px 28px;
+  color: #1f2937;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto; /* מאפשר גלילה פנימית */
+  -webkit-overflow-scrolling: touch; /* גלילה חלקה במובייל */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* חוויית גלילה רכה */
+.modal__card.add-form::-webkit-scrollbar {
+  width: 5px;
+}
+.modal__card.add-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+
+/* כדי למנוע גלילה כפולה מאחורי המודאל */
+body.modal-open {
+  overflow: hidden;
+}
