@@ -206,7 +206,7 @@ async function loadSummary(sb, ym) {
           </div>
         </div>
         <div class="prog ${over ? 'over' : ''}">
-          <div class="fill" style="width:${pct}%"></div>
+<div class="fill" style="width:${pct}%; --target-width:${pct}%;"></div>
         </div>
       </div>
     `;
