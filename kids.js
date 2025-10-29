@@ -213,7 +213,7 @@ let pendingDeleteTxId = null;
       const note  = els.kidNote.value || '';
       if (!kidId) throw new Error('חסר מזהה ילד');
       if (!date)  throw new Error('יש לבחור תאריך');
-      if (amount <= 0) throw new Error('סכום חייב להיות גדול מאפס');
+      // if (amount <= 0) throw new Error('סכום חייב להיות גדול מאפס');
 
       await addKidTx(sb, kidId, type, amount, date, note);
 
